@@ -1,0 +1,164 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif; 
+  height: 500px; /* Adjust height */
+  width: 250px; /* Adjust width  */
+  font-family: 'Times New Roman', Times, serif;
+
+}
+.title {
+  font-size: 25px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  font-weight: 400;
+  text-align: center;
+}
+
+.container {
+  display:inline-flexbox;
+  justify-content:space-between;
+  align-items: center;
+  height: auto; /* Adjust height */
+  width: auto; /* Adjust width  */
+  border-top: solid #7643db;
+}
+.container-1 {
+  display:inline-flexbox;
+  justify-content:space-between;
+  align-items: center;
+  height: auto; /* Adjust height */
+  width: auto; /* Adjust width  */
+  border-top: solid #7643db;
+  border-bottom: solid #7643db;
+  margin-bottom: 10px;
+}
+
+.button {
+  align-items: center;
+  background-color: #ffffff;
+  margin-bottom: 10px;
+  padding: 10px;
+  margin: auto;
+}
+
+.button span {
+  margin-right: 10px;
+}
+
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  float: right;
+  bottom: 3px;
+  display: inline-block;
+  width: 59px;
+  height: 21px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #cccccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 34px; 
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 17px;
+  width: 17px;
+  left: 3px;
+  bottom: 2px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 50%; 
+}
+
+input:checked + .slider{
+  background-color: #7643db; 
+}
+
+input:checked + .slider:before{
+  background-color: #8C52FF; 
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px white;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+.slider {
+  /* CSS code */
+  transition: transform 0.3s ease-in-out;
+}
+span{
+  font-weight:600;
+}
+::-ms-input-placeholder { 
+  color: rgb(255, 255, 255);
+}
+
+::placeholder {
+  color: rgb(255, 255, 255);
+  opacity: 0.7;
+}
+/*SSL CHECKER*/
+.ssl-title{
+  padding-left: 10px;
+  padding-bottom: 5px;
+  margin-top: -5px;
+  margin-bottom: -5px;
+}
+
+.bg-ssl{
+  background-color: #8C52FF; 
+  padding: 5px;
+  margin: 5px;
+  width: 229px;
+  height: 60px;
+  border-radius: 10px;
+  display:block;
+  align-items: center;
+}
+
+#textInput{
+  border: none;
+  width: 219px;
+  background-color:transparent;
+  color: white;
+  margin-top: 5px;
+  margin-bottom: 3px;
+  padding: 5px;
+  
+}
+.check-btn{
+  border-radius: 34px;
+  background-color: #7643DB;
+  color: white;
+  font-family: 'Times New Roman', Times, serif;
+  border: none;
+  width:100%;
+  height: 25px;
+  padding: 5px;
+  margin:auto;
+}

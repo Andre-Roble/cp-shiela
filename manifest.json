@@ -1,0 +1,12 @@
+{
+    "manifest_version": 3,
+    "name": "SHIELA",
+    "version": "0.0.1",
+    "description": "SHIELA will provide users with SSL certificate verification, ensuring secure connection through HTTPS enforcement, phishing site detection, enforced ad blocking, blacklisting URL analysis, and alerts and warnings.",
+    "action": {
+      "default_popup": "main.html",
+      "default_icon": "s-img.png"
+    }
+    
+  }
+  
