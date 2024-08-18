@@ -5,7 +5,12 @@
     "description": "SHIELA will provide users with SSL certificate verification, ensuring secure connection through HTTPS enforcement, phishing site detection, enforced ad blocking, blacklisting URL analysis, and alerts and warnings.",
     "action": {
       "default_popup": "main.html",
-      "default_icon": "s-img.png"
+      "default_icon": "src/bs-img.png"
+    },
+    "icons":{
+      "16":"src/bs-img.png",
+      "48":"src/bs-img.png",
+      "128":"src/bs-img.png"
     }
     
   }
