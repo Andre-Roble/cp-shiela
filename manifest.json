@@ -3,6 +3,10 @@
     "name": "SHIELA",
     "version": "0.0.1",
     "description": "SHIELA will provide users with SSL certificate verification, ensuring secure connection through HTTPS enforcement, phishing site detection, enforced ad blocking, blacklisting URL analysis, and alerts and warnings.",
+    "permissions": ["declarativeNetRequest", "storage", "activeTab", "declarativeNetRequestFeedback"],
+    "background": {
+      "service_worker": "background.js"
+    },
     "action": {
       "default_popup": "main.html",
       "default_icon": "src/bs-img.png"
@@ -11,7 +15,14 @@
       "16":"src/bs-img.png",
       "48":"src/bs-img.png",
       "128":"src/bs-img.png"
-    }
-    
+    },
+    "declarative_net_request": {
+    "rule_resources": [{
+      "id": "block_ads_ruleset",
+      "enabled": true,
+      "path": "rules.json"
+    }]
   }
+
+}
   
