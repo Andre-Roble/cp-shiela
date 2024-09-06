@@ -1,28 +1,41 @@
 {
-    "manifest_version": 3,
-    "name": "SHIELA",
-    "version": "0.0.1",
-    "description": "SHIELA will provide users with SSL certificate verification, ensuring secure connection through HTTPS enforcement, phishing site detection, enforced ad blocking, blacklisting URL analysis, and alerts and warnings.",
-    "permissions": ["declarativeNetRequest", "storage", "activeTab", "declarativeNetRequestFeedback"],
-    "background": {
-      "service_worker": "background.js"
-    },
-    "action": {
-      "default_popup": "main.html",
-      "default_icon": "src/bs-img.png"
-    },
-    "icons":{
-      "16":"src/bs-img.png",
-      "48":"src/bs-img.png",
-      "128":"src/bs-img.png"
-    },
-    "declarative_net_request": {
+  "manifest_version": 3,
+  "name": "SHIELA",
+  "version": "0.0.1",
+  "description": "SHIELA will provide users with SSL certificate verification, ensuring secure connection through HTTPS enforcement, phishing site detection, enforced ad blocking, blacklisting URL analysis, and alerts and warnings.",
+  "permissions": [
+    "declarativeNetRequest", 
+    "storage", 
+    "activeTab", 
+    "declarativeNetRequestFeedback",
+    "webRequest",
+    "webRequestBlocking",
+    "https://safebrowsing.googleapis.com/"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": [
+    "https://*/*",
+    "http://*/*"
+  ],
+  "action": {
+    "default_popup": "main.html",
+    "default_icon": "src/bs-img.png"
+  },
+  "icons": {
+    "16": "src/bs-img.png",
+    "48": "src/bs-img.png",
+    "128": "src/bs-img.png"
+  },
+  "declarative_net_request": {
     "rule_resources": [{
       "id": "block_ads_ruleset",
       "enabled": true,
       "path": "rules.json"
     }]
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src https://safebrowsing.googleapis.com;"
   }
-
 }
-  

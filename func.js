@@ -1,19 +1,33 @@
 document.addEventListener('DOMContentLoaded', () => {
   const toggleSwitch = document.getElementById('myCheck');
+  const statusElement = document.getElementById('status');
 
   if (toggleSwitch) {
     toggleSwitch.addEventListener('change', () => {
       if (toggleSwitch.checked) {
-        // Add a delay for smooth animation 
-        setTimeout(() => {
-          window.location.href = 'sub.html';
-        }, 400); // Adjust delay
+        statusElement.textContent = 'Checking site for phishing...';
+
+        // Send a message to background.js to check the current URL for phishing
+        chrome.runtime.sendMessage({ action: 'checkPhishing', url: window.location.href }, (response) => {
+          if (response.isPhishing) {
+            statusElement.textContent = 'Warning: Phishing site detected!';
+            alert('Warning: This site may be a phishing site!');
+          } else if (response.error) {
+            console.error('Phishing check failed:', response.error);
+            statusElement.textContent = 'Error checking site.';
+          } else {
+            statusElement.textContent = 'Site is safe.';
+          }
+        });
+      } else {
+        statusElement.textContent = ''; // Clear status when phishing check is turned off
       }
     });
   } else {
     console.error('Element with id "myCheck" not found.');
   }
 });
+
 
 
 // document.addEventListener('DOMContentLoaded', () => {
