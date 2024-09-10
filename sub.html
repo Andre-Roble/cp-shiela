@@ -3,10 +3,19 @@
 <head>
   <title>Shiela</title>
   <link rel="stylesheet" href="style-1.css">
+  
 </head>
 <body>
-  <div class="title">SHIELA</div>
+  <div class="title-container">
+    <img src="src/bs-img.png" alt="Image" class="title-image">
+    <div class="title">SHIELA</div>
+  </div>
+
   <div class="container">
+    
+    <button class="back-button">
+      <span>&#8592;</span>
+    </button>
 
     <div class="button block-ads">
         <span>Block Ads</span>
@@ -27,18 +36,22 @@
       </div>
     </div>
       
-    <form id="ssl-check-form" method="POST"  action="">
-        <div class="ssl-title"><span>SSL Certificate Checker</span></div>
-    
+      <form id="ssl-check-form" > 
+        <div class="ssl-title">
+        <span>SSL Certificate Checker</span></div>
         <div class="bg-ssl">
+
             <div><input type="text" id="textInput" placeholder="Enter desired URL"></div>
-            <div><button class="check-btn">Check</button></div>
+            <div><button class="check-btn" type="button">Check</button></div>
+            
         </div>
 
-        <div id="ssl-result"></div>
     </form>
 
-   ]
+    <div id="ssl-result"></div>
+   
   <script src="func1.js"></script>
+  <script src="background.js"></script>
+  
 </body>
 </html>
