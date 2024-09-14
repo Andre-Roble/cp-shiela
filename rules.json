@@ -163,38 +163,5 @@
         "urlFilter": "||advertising.com^",
         "resourceTypes": ["main_frame", "sub_frame", "media"]
       }
-    },
-    {
-      "id": 17,
-      "priority": 1,
-      "action": {
-        "type": "block"
-      },
-      "condition": {
-        "urlFilter": "*://*ad*",
-        "resourceTypes": ["main_frame", "sub_frame"]
-      }
-    },
-    {
-      "id": 18,
-      "priority": 1,
-      "action": {
-        "type": "block"
-      },
-      "condition": {
-        "urlFilter": "||*.ads.*^",
-        "resourceTypes": ["main_frame", "sub_frame"]
-      }
-    },
-    {
-      "id": 19,
-      "priority": 1,
-      "action": {
-        "type": "block"
-      },
-      "condition": {
-        "urlFilter": "||*.banner.*^",
-        "resourceTypes": ["main_frame", "sub_frame"]
-      }
     }
 ]
