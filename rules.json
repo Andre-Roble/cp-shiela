@@ -163,5 +163,68 @@
         "urlFilter": "||advertising.com^",
         "resourceTypes": ["main_frame", "sub_frame", "media"]
       }
+    },
+    {
+      "id": 17,
+      "priority": 1,
+      "action": { "type": "block" },
+      "condition": {
+        "urlFilter": "*://*/*flash*.swf",
+        "resourceTypes": ["main_frame", "sub_frame", "media"]
+      }
+    },
+    {
+      "id": 18,
+      "priority": 1,
+      "action": { "type": "block" },
+      "condition": {
+        "urlFilter": "*://*/*.gif",
+        "resourceTypes": ["image"]
+      }
+    },
+    {
+      "id": 19,
+      "priority": 1,
+      "action": { "type": "block" },
+      "condition": {
+        "urlFilter": "*://*/*banner*",
+        "resourceTypes": ["image"]
+      }
+    },
+    {
+      "id": 20,
+      "priority": 1,
+      "action": { "type": "block" },
+      "condition": {
+        "urlFilter": "*://*/*advert*",
+        "resourceTypes": ["image"]
+      }
+    },
+    {
+      "id": 21,
+      "priority": 1,
+      "action": { "type": "block" },
+      "condition": {
+        "urlFilter": "*://*/*ad-image*",
+        "resourceTypes": ["image"]
+      }
+    },
+    {
+      "id": 22,
+      "priority": 1,
+      "action": { "type": "block" },
+      "condition": {
+        "urlFilter": "*://*/*advertisement*",
+        "resourceTypes": ["image"]
+      }
+    },
+    {
+      "id": 23,
+      "priority": 1,
+      "action": { "type": "block" },
+      "condition": {
+        "urlFilter": "*://*/*promotion*",
+        "resourceTypes": ["image"]
+      }
     }
 ]

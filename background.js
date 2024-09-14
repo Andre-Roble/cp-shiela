@@ -1,5 +1,17 @@
 console.log('Background JS is running');
 
+// Basic setup to test if the script runs without issues
+chrome.runtime.onStartup.addListener(() => {
+  console.log('Extension started');
+});
+
+// Basic listener example
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  console.log('Message received:', request);
+  sendResponse({ status: 'success' });
+});
+
+
 // Function to enable ad and tracker blocking
 function enableAdBlocking() {
   chrome.declarativeNetRequest.updateEnabledRulesets(
@@ -22,30 +34,8 @@ function disableAdBlocking() {
 chrome.storage.sync.get(['adBlockEnabled'], (result) => {
   if (result.adBlockEnabled) {
     enableAdBlocking();
-  } else {
-    disableAdBlocking();
   }
 });
-
-// Function to block requests based on patterns
-function blockRequest(details) {
-  return { cancel: true };
-}
-
-// Add listener to block Flash banners, GIF images, and static images
-chrome.webRequest.onBeforeRequest.addListener(
-  blockRequest,
-  { urls: [
-    "*://*/*flash*.swf",
-    "*://*/*.gif",
-    "*://*/*banner*",
-    "*://*/*advert*",
-    "*://*/*ad-image*",
-    "*://*/*advertisement*",
-    "*://*/*promotion*"
-  ]},
-  ["blocking"]
-);
 
 // Listen for messages from popup or other parts of the extension to toggle ad-blocking
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

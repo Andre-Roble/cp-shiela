@@ -9,8 +9,7 @@
     "activeTab",
     "tabs",
     "storage",
-    "scripting",
-    "webRequest"
+    "scripting"
   ],
   "host_permissions": [
     "https://*/*",
@@ -38,8 +37,7 @@
   },
 "content_scripts": [
   {
-    "matches": [    "https://*/*",
-    "http://*/*"],
+    "matches": ["https://*/*", "http://*/*"],
     "js": ["contentScript.js"],
     "run_at": "document_end"
   }
