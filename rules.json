@@ -165,13 +165,14 @@
       }
     },
     {
+    {
       "id": 17,
       "priority": 1,
       "action": {
         "type": "block"
       },
       "condition": {
-        "urlFilter": "||*.ad.*^",
+        "urlFilter": "*://*ad*",
         "resourceTypes": ["main_frame", "sub_frame"]
       }
     },
