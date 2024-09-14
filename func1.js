@@ -3,40 +3,172 @@ const blockAdTrackersCheckbox = document.querySelector('.block-ad-trackers input
 const blockAdsButton = document.querySelector('.block-ads span');
 const blockAdTrackersButton = document.querySelector('.block-ad-trackers span');
 
+// Initialize settings from Chrome storage
 chrome.storage.sync.get(['adBlockEnabled'], (result) => {
   blockAdsCheckbox.checked = result.adBlockEnabled || false;
   blockAdsButton.textContent = blockAdsCheckbox.checked ? 'Ads Blocked' : 'Block Ads';
 });
 
-// listen for checkbox if toggled or not
+// Event listener for blocking/unblocking ads
 blockAdsCheckbox.addEventListener('change', () => {
   const isEnabled = blockAdsCheckbox.checked;
-  
-  blockAdsButton.textContent = isEnabled ? 'Ads Blocked' : 'Block Ads';
 
-  // send message to background script to enable/disable ad blocking
+  if (isEnabled) {
+    blockAdsButton.textContent = 'Ads Blocked';
+    blockAds();        // Call function to block ads
+    blockCosmetic();    // Call function to block cosmetic ads
+    blockAdScripts();   // Call function to block ad scripts
+  } else {
+    blockAdsButton.textContent = 'Block Ads';
+    unblockAds();      // Call function to unblock ads
+    unblockCosmetic(); // Call function to unblock cosmetic ads
+    unblockAdScripts(); // Call function to unblock ad scripts
+  }
+
+  // Send message to background script to enable/disable ad blocking
   chrome.runtime.sendMessage({ action: 'toggleAdBlock', enabled: isEnabled });
 
-  // save the state
+  // Save the state
   chrome.storage.sync.set({ adBlockEnabled: isEnabled });
 });
 
+// Event listener for blocking/unblocking ad trackers
 blockAdTrackersCheckbox.addEventListener('change', () => {
   if (blockAdTrackersCheckbox.checked) {
     blockAdTrackersButton.textContent = 'Ad Trackers Blocked';
-    // logic for blocking ad trackers
+    blockTrackers(); // Call function to block trackers
   } else {
     blockAdTrackersButton.textContent = 'Block Ad Trackers';
-    // Logic for unblocking ad trackers
+    unblockTrackers(); // Call function to unblock trackers
   }
 });
 
-//back button
-
+// Back button
 document.querySelector('.back-button').addEventListener('click', () => {
   // Add your logic here to go back to the previous page
   window.history.back();
 });
+
+
+const RULESET_ID = 'ruleset_1';
+
+// Function to block ads and trackers by enabling the ruleset
+function blockAds() {
+  chrome.declarativeNetRequest.updateEnabledRulesets(
+    { enableRulesetIds: [RULESET_ID] },
+    () => {
+      console.log("Ads and trackers have been blocked.");
+    }
+  );
+}
+
+// Function to unblock ads and trackers by disabling the ruleset
+function unblockAds() {
+  chrome.declarativeNetRequest.updateEnabledRulesets(
+    { disableRulesetIds: [RULESET_ID] },
+    () => {
+      console.log("Ads and trackers have been unblocked.");
+    }
+  );
+}
+
+// Function to block ad trackers using specific URL patterns
+function blockTrackers() {
+  chrome.declarativeNetRequest.updateDynamicRules({
+    addRules: [
+      { id: 11, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.google-analytics.com/*", resourceTypes: ["script", "xmlhttprequest"] } },
+      { id: 12, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.facebook.com/*", resourceTypes: ["script", "xmlhttprequest"] } },
+      { id: 13, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.googletagmanager.com/*", resourceTypes: ["script", "xmlhttprequest"] } },
+      { id: 14, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.scorecardresearch.com/*", resourceTypes: ["script", "xmlhttprequest"] } },
+      { id: 15, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.doubleclick.net/*", resourceTypes: ["script", "xmlhttprequest"] } },
+      { id: 16, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.adservice.google.com/*", resourceTypes: ["script", "xmlhttprequest"] } },
+      { id: 17, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.quantserve.com/*", resourceTypes: ["script", "xmlhttprequest"] } },
+      { id: 18, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.pinterest.com/*", resourceTypes: ["script", "xmlhttprequest"] } },
+      { id: 19, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.linkedin.com/*", resourceTypes: ["script", "xmlhttprequest"] } },
+      { id: 23, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.*.tracker.*^", resourceTypes: ["script", "xmlhttprequest"] } },
+      { id: 24, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.*.tracking.*^", resourceTypes: ["script", "xmlhttprequest"] } },
+      { id: 25, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.*.analytics.*^", resourceTypes: ["script", "xmlhttprequest"] } }
+    ],
+    removeRuleIds: Array.from({ length: 11 }, (_, i) => 11 + i) // Remove corresponding unblock rules
+  });
+}
+
+// Function to unblock ad trackers
+function unblockTrackers() {
+  chrome.declarativeNetRequest.updateDynamicRules({
+    removeRuleIds: Array.from({ length: 11 }, (_, i) => 11 + i)
+  });
+}
+
+// Function to block cosmetic ads (blocking based on CSS selectors)
+function blockCosmetic() {
+  chrome.declarativeNetRequest.updateDynamicRules({
+    addRules: [
+      {
+        id: 30,
+        priority: 1,
+        action: { type: "block" },
+        condition: {
+          css: ["div.ad", "div.ads", "div.banner"], // Block based on CSS selectors
+          resourceTypes: ["main_frame"]
+        }
+      }
+    ],
+    removeRuleIds: [130]
+  });
+}
+
+// Function to unblock cosmetic ads
+function unblockCosmetic() {
+  chrome.declarativeNetRequest.updateDynamicRules({
+    removeRuleIds: [30]
+  });
+}
+
+// Function to block ad scripts
+function blockAdScripts() {
+  chrome.declarativeNetRequest.updateDynamicRules({
+    addRules: [
+      {
+        id: 40,
+        priority: 1,
+        action: { type: "block" },
+        condition: {
+          urlFilter: "||adsbygoogle.js^", // Block Google ad script
+          resourceTypes: ["script"]
+        }
+      },
+      {
+        id: 41,
+        priority: 1,
+        action: { type: "block" },
+        condition: {
+          urlFilter: "||googleadservices.com^", // Block Google ad services
+          resourceTypes: ["script"]
+        }
+      }
+    ],
+    removeRuleIds: [140, 141]
+  });
+}
+
+// Function to unblock ad scripts
+function unblockAdScripts() {
+  chrome.declarativeNetRequest.updateDynamicRules({
+    removeRuleIds: [40, 41]
+  });
+}
+
+
+
+
+
+
+
+
+
+
+
 
 const checkButton = document.querySelector('.check-btn');
 checkButton.addEventListener('click', fetchData);

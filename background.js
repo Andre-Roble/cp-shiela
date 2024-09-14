@@ -1,19 +1,20 @@
-// Function that enables ad blocking
+console.log('Background JS is running');
+
+// Function to enable ad and tracker blocking
 function enableAdBlocking() {
   chrome.declarativeNetRequest.updateEnabledRulesets(
-    { enableRulesetIds: ["block_ads_ruleset"] },
-    () => {
-      console.log("Ad-blocking enabled");
-    }
+    { enableRulesetIds: ["ruleset_1"] },
+    () => 
+      console.log("Ad and tracker blocking enabled.")
   );
 }
 
+// Function to disable ad and tracker blocking
 function disableAdBlocking() {
   chrome.declarativeNetRequest.updateEnabledRulesets(
-    { disableRulesetIds: ["block_ads_ruleset"] },
-    () => {
-      console.log("Ad-blocking disabled");
-    }
+    { disableRulesetIds: ["ruleset_1"] },
+    () => 
+      console.log("Ad and tracker blocking disabled.")
   );
 }
 
@@ -21,10 +22,32 @@ function disableAdBlocking() {
 chrome.storage.sync.get(['adBlockEnabled'], (result) => {
   if (result.adBlockEnabled) {
     enableAdBlocking();
+  } else {
+    disableAdBlocking();
   }
 });
 
-// Listen for messages from popup to toggle ad-blocking
+// Function to block requests based on patterns
+function blockRequest(details) {
+  return { cancel: true };
+}
+
+// Add listener to block Flash banners, GIF images, and static images
+chrome.webRequest.onBeforeRequest.addListener(
+  blockRequest,
+  { urls: [
+    "*://*/*flash*.swf",
+    "*://*/*.gif",
+    "*://*/*banner*",
+    "*://*/*advert*",
+    "*://*/*ad-image*",
+    "*://*/*advertisement*",
+    "*://*/*promotion*"
+  ]},
+  ["blocking"]
+);
+
+// Listen for messages from popup or other parts of the extension to toggle ad-blocking
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'toggleAdBlock') {
     if (request.enabled) {
@@ -35,7 +58,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     sendResponse({ status: 'success' });
   }
 
-  // Handle phishing detection requests
   if (request.action === 'checkPhishing') {
     checkPhishing(request.url)
       .then(isPhishing => {
@@ -46,7 +68,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         sendResponse({ isPhishing: false, error: error.message });
       });
 
-    // Required to allow async response
     return true;
   }
 });
@@ -81,3 +102,18 @@ async function checkPhishing(url) {
   // Return true if phishing is detected
   return data && data.matches && data.matches.length > 0;
 }
+
+// Listen for action button click to toggle blocking
+chrome.action.onClicked.addListener(() => {
+  chrome.storage.sync.get(['adBlockEnabled'], (result) => {
+    const isEnabled = result.adBlockEnabled;
+
+    if (isEnabled) {
+      disableAdBlocking();
+      chrome.storage.sync.set({ adBlockEnabled: false });
+    } else {
+      enableAdBlocking();
+      chrome.storage.sync.set({ adBlockEnabled: true });
+    }
+  });
+});

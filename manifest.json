@@ -1,39 +1,47 @@
 {
-    "manifest_version": 3,
-    "name": "SHIELA",
-    "version": "0.0.1",
-    "description": "SHIELA will provide users with SSL certificate verification, ensuring secure connection through HTTPS enforcement, phishing site detection, enforced ad blocking, blacklisting URL analysis, and alerts and warnings.",
-    "permissions": [
-      "declarativeNetRequest", 
-      "storage", 
-      "activeTab",
-      "tabs", 
-      "declarativeNetRequestFeedback",
-      "webRequest"
-    ],
-
-    "content_scripts": [
-      
+  "manifest_version": 3,
+  "name": "SHIELA",
+  "version": "1.0",
+  "description": "SHIELA will provide users with SSL certificate verification, ensuring secure connection through HTTPS enforcement, phishing site detection, enforced ad blocking, blacklisting URL analysis, and alerts and warnings.",
+  "permissions": [
+    "declarativeNetRequest",
+    "declarativeNetRequestFeedback",
+    "activeTab",
+    "tabs",
+    "storage",
+    "scripting",
+    "webRequest"
   ],
-    "background": {
-      "service_worker": "background.js"
-    },
-    "action": {
-      "default_popup": "main.html",
-      "default_icon": "src/bs-img.png"
-    },
-    "icons":{
-      "16":"src/bs-img.png",
-      "48":"src/bs-img.png",
-      "128":"src/bs-img.png"
-    },
-    "declarative_net_request": {
-    "rule_resources": [{
-      "id": "block_ads_ruleset",
-      "enabled": true,
-      "path": "rules.json"
-    }] 
+  "host_permissions": [
+    "https://*/*",
+    "http://*/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "main.html",
+    "default_icon": "src/bs-img.png"
+  },
+  "icons": {
+    "16": "src/bs-img.png",
+    "48": "src/bs-img.png",
+    "128": "src/bs-img.png"
+  },
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "ruleset_1",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  },
+"content_scripts": [
+  {
+    "matches": [    "https://*/*",
+    "http://*/*"],
+    "js": ["contentScript.js"],
+    "run_at": "document_end"
   }
-  
+]
 }
-  
