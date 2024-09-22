@@ -223,8 +223,99 @@
       "priority": 1,
       "action": { "type": "block" },
       "condition": {
-        "urlFilter": "*://*/*promotion*",
-        "resourceTypes": ["image"]
+        "urlFilter": "*://*.matomo.org/*",
+        "resourceTypes": ["script", "xmlhttprequest"]
+      }
+    },
+    {
+      "id": 24,
+      "priority": 1,
+      "action": { "type": "block" },
+      "condition": {
+        "urlFilter": "*://*.mixpanel.com/*",
+        "resourceTypes": ["script", "xmlhttprequest"]
+      }
+    },
+    {
+      "id": 25,
+      "priority": 1,
+      "action": { "type": "block" },
+      "condition": {
+        "urlFilter": "*://*.optimizely.com/*",
+        "resourceTypes": ["script", "xmlhttprequest"]
+      }
+    },
+    {
+      "id": 26,
+      "priority": 1,
+      "action": { "type": "block" },
+      "condition": {
+        "urlFilter": "*://*.clicktale.net/*",
+        "resourceTypes": ["script", "xmlhttprequest"]
+      }
+    },
+    {
+      "id": 27,
+      "priority": 1,
+      "action": { "type": "block" },
+      "condition": {
+        "urlFilter": "*://*.quantcast.com/*",
+        "resourceTypes": ["script", "xmlhttprequest"]
+      }
+    },
+    {
+      "id": 28,
+      "priority": 1,
+      "action": { "type": "block" },
+      "condition": {
+        "urlFilter": "*://*.adroll.com/*",
+        "resourceTypes": ["script", "xmlhttprequest"]
+      }
+    },
+    {
+      "id": 29,
+      "priority": 1,
+      "action": { "type": "block" },
+      "condition": {
+        "urlFilter": "*://*.criteo.com/*",
+        "resourceTypes": ["script", "xmlhttprequest"]
+      }
+    },
+    {
+      "id": 30,
+      "priority": 1,
+      "action": { "type": "block" },
+      "condition": {
+        "urlFilter": "*://*.adobe.com/*",
+        "resourceTypes": ["script", "xmlhttprequest"]
+      }
+    },
+    {
+      "id": 31,
+      "priority": 1,
+      "action": { "type": "block" },
+      "condition": {
+        "urlFilter": "*://*.yandex.ru/*",
+        "resourceTypes": ["script", "xmlhttprequest"]
+      }
+    },
+    {
+      "id": 32,
+      "priority": 1,
+      "action": { "type": "block" },
+      "condition": {
+        "urlFilter": "*://*.affiliate.com/*",
+        "resourceTypes": ["script", "xmlhttprequest"]
+      }
+    },
+    {
+      "id": 33,
+      "priority": 1,
+      "action": { "type": "block" },
+      "condition": {
+        "urlFilter": "*://*.trackingsystem.com/*",
+        "resourceTypes": ["script", "xmlhttprequest"]
       }
     }
+    
 ]

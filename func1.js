@@ -4,9 +4,11 @@ const blockAdsButton = document.querySelector('.block-ads span');
 const blockAdTrackersButton = document.querySelector('.block-ad-trackers span');
 
 // Initialize settings from Chrome storage
-chrome.storage.sync.get(['adBlockEnabled'], (result) => {
+chrome.storage.sync.get(['adBlockEnabled', 'adTrackerEnabled'], (result) => {
   blockAdsCheckbox.checked = result.adBlockEnabled || false;
+  blockAdTrackersCheckbox.checked = result.adTrackerEnabled || false;
   blockAdsButton.textContent = blockAdsCheckbox.checked ? 'Ads Blocked' : 'Block Ads';
+  blockAdTrackersButton.textContent = blockAdTrackersCheckbox.checked ? 'Ad Trackers Blocked' : 'Block Ad Trackers';
 });
 
 // Event listener for blocking/unblocking ads
@@ -30,21 +32,24 @@ blockAdsCheckbox.addEventListener('change', () => {
 
 // Event listener for blocking/unblocking ad trackers
 blockAdTrackersCheckbox.addEventListener('change', () => {
-  if (blockAdTrackersCheckbox.checked) {
+  const isEnabled = blockAdTrackersCheckbox.checked;
+
+  if (isEnabled) {
     blockAdTrackersButton.textContent = 'Ad Trackers Blocked';
     blockTrackers(); // Call function to block trackers
   } else {
     blockAdTrackersButton.textContent = 'Block Ad Trackers';
     unblockTrackers(); // Call function to unblock trackers
   }
+
+  // Save the state
+  chrome.storage.sync.set({ adTrackerEnabled: isEnabled });
 });
 
 // Back button
 document.querySelector('.back-button').addEventListener('click', () => {
-  // Add your logic here to go back to the previous page
   window.history.back();
 });
-
 
 const RULESET_ID = 'ruleset_1';
 
@@ -53,7 +58,7 @@ function blockAds() {
   chrome.declarativeNetRequest.updateEnabledRulesets(
     { enableRulesetIds: [RULESET_ID] },
     () => {
-      console.log("Ads and trackers have been blocked.");
+      console.log("Ads have been blocked.");
     }
   );
 }
@@ -63,7 +68,7 @@ function unblockAds() {
   chrome.declarativeNetRequest.updateEnabledRulesets(
     { disableRulesetIds: [RULESET_ID] },
     () => {
-      console.log("Ads and trackers have been unblocked.");
+      console.log("Ads have been unblocked.");
     }
   );
 }
@@ -80,10 +85,7 @@ function blockTrackers() {
       { id: 16, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.adservice.google.com/*", resourceTypes: ["script", "xmlhttprequest"] } },
       { id: 17, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.quantserve.com/*", resourceTypes: ["script", "xmlhttprequest"] } },
       { id: 18, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.pinterest.com/*", resourceTypes: ["script", "xmlhttprequest"] } },
-      { id: 19, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.linkedin.com/*", resourceTypes: ["script", "xmlhttprequest"] } },
-      { id: 20, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.*.tracker.*^", resourceTypes: ["script", "xmlhttprequest"] } },
-      { id: 21, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.*.tracking.*^", resourceTypes: ["script", "xmlhttprequest"] } },
-      { id: 22, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.*.analytics.*^", resourceTypes: ["script", "xmlhttprequest"] } }
+      { id: 19, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.linkedin.com/*", resourceTypes: ["script", "xmlhttprequest"] } }
     ],
     removeRuleIds: Array.from({ length: 11 }, (_, i) => 11 + i) // Remove corresponding unblock rules
   });
@@ -96,21 +98,9 @@ function unblockTrackers() {
   });
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
+// Check SSL button functionality
 const checkButton = document.querySelector('.check-btn');
 checkButton.addEventListener('click', fetchData);
-
 
 chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
   var currentTab = tabs[0];
@@ -148,7 +138,6 @@ async function fetchData() {
     displayError('Failed to fetch data. Please try again later.');
   }
 }
-
 
 function displayResults(data) {
   const resultElement = document.getElementById('ssl-result');
@@ -220,12 +209,12 @@ function displayResults(data) {
 
   const showMoreButton = document.createElement('button');
   showMoreButton.textContent = '--Show more--';
-  showMoreButton.classList.add('show-more-button'); // add a class to the button
+  showMoreButton.classList.add('show-more-button');
   showMoreButton.onclick = () => {
     resultElement.innerHTML = tableTemplate(data, [...keysToDisplay, ...keysToDisplay1]);
     const showLessButton = document.createElement('button');
     showLessButton.textContent = '--Show less--';
-    showLessButton.classList.add('show-less-button'); // add a class to the button
+    showLessButton.classList.add('show-less-button');
     showLessButton.onclick = () => {
       resultElement.innerHTML = tableTemplate(data, keysToDisplay);
       resultElement.appendChild(showMoreButton);
