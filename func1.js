@@ -16,13 +16,9 @@ blockAdsCheckbox.addEventListener('change', () => {
   if (isEnabled) {
     blockAdsButton.textContent = 'Ads Blocked';
     blockAds();        // Call function to block ads
-    blockCosmetic();    // Call function to block cosmetic ads
-    blockAdScripts();   // Call function to block ad scripts
   } else {
     blockAdsButton.textContent = 'Block Ads';
     unblockAds();      // Call function to unblock ads
-    unblockCosmetic(); // Call function to unblock cosmetic ads
-    unblockAdScripts(); // Call function to unblock ad scripts
   }
 
   // Send message to background script to enable/disable ad blocking
@@ -85,9 +81,9 @@ function blockTrackers() {
       { id: 17, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.quantserve.com/*", resourceTypes: ["script", "xmlhttprequest"] } },
       { id: 18, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.pinterest.com/*", resourceTypes: ["script", "xmlhttprequest"] } },
       { id: 19, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.linkedin.com/*", resourceTypes: ["script", "xmlhttprequest"] } },
-      { id: 23, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.*.tracker.*^", resourceTypes: ["script", "xmlhttprequest"] } },
-      { id: 24, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.*.tracking.*^", resourceTypes: ["script", "xmlhttprequest"] } },
-      { id: 25, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.*.analytics.*^", resourceTypes: ["script", "xmlhttprequest"] } }
+      { id: 20, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.*.tracker.*^", resourceTypes: ["script", "xmlhttprequest"] } },
+      { id: 21, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.*.tracking.*^", resourceTypes: ["script", "xmlhttprequest"] } },
+      { id: 22, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.*.analytics.*^", resourceTypes: ["script", "xmlhttprequest"] } }
     ],
     removeRuleIds: Array.from({ length: 11 }, (_, i) => 11 + i) // Remove corresponding unblock rules
   });
@@ -100,64 +96,6 @@ function unblockTrackers() {
   });
 }
 
-// Function to block cosmetic ads (blocking based on CSS selectors)
-function blockCosmetic() {
-  chrome.declarativeNetRequest.updateDynamicRules({
-    addRules: [
-      {
-        id: 30,
-        priority: 1,
-        action: { type: "block" },
-        condition: {
-          css: ["div.ad", "div.ads", "div.banner"], // Block based on CSS selectors
-          resourceTypes: ["main_frame"]
-        }
-      }
-    ],
-    removeRuleIds: [130]
-  });
-}
-
-// Function to unblock cosmetic ads
-function unblockCosmetic() {
-  chrome.declarativeNetRequest.updateDynamicRules({
-    removeRuleIds: [30]
-  });
-}
-
-// Function to block ad scripts
-function blockAdScripts() {
-  chrome.declarativeNetRequest.updateDynamicRules({
-    addRules: [
-      {
-        id: 40,
-        priority: 1,
-        action: { type: "block" },
-        condition: {
-          urlFilter: "||adsbygoogle.js^", // Block Google ad script
-          resourceTypes: ["script"]
-        }
-      },
-      {
-        id: 41,
-        priority: 1,
-        action: { type: "block" },
-        condition: {
-          urlFilter: "||googleadservices.com^", // Block Google ad services
-          resourceTypes: ["script"]
-        }
-      }
-    ],
-    removeRuleIds: [140, 141]
-  });
-}
-
-// Function to unblock ad scripts
-function unblockAdScripts() {
-  chrome.declarativeNetRequest.updateDynamicRules({
-    removeRuleIds: [40, 41]
-  });
-}
 
 
 
