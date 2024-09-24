@@ -10,9 +10,10 @@
 }
 body {
   margin: 0;
-  height: 225px; /* Adjust height */
+  height: 260px; /* Adjust height */
   width: 250px; /* Adjust width  */
   font-family: 'Times New Roman', Times, serif;
+
 
 }
 .title-container {
@@ -54,6 +55,14 @@ body {
   border-bottom: solid #8C52FF;
   margin-bottom: 10px;
 }
+.container-2 {
+  display:inline-flexbox;
+  justify-content:space-between;
+  align-items: center;
+  height: auto; 
+  width: auto; 
+  border-top: solid #8C52FF;
+}
 
 .button {
   align-items: center;
@@ -61,6 +70,8 @@ body {
   margin-bottom: 10px;
   padding: 10px;
   margin: auto;
+  /* box-shadow: 0 0 10px rgba(255, 0, 123, 0.5); Adjust values as needed */
+
 }
 
 .button span {
@@ -160,20 +171,8 @@ span{
   color: #ffffff;
   font-family: 'Times New Roman', Times, serif;
 
-  /* border: none;
-  width: 219px;
-  background-color:transparent;
-  font-family: 'Times New Roman', Times, serif;
-  color: white;
-  margin-top: 5px;
-  margin-bottom: 3px;
-  padding: 5px;
-   */
 }
-/* #textInput:focus{
-  border-color: #e77600;
-  box-shadow: 0 0 3px 2px rgb(228 121 17 / 50%);
-} */
+
 .ssl-title{
   padding-left: 10px;
   padding-bottom: 5px;

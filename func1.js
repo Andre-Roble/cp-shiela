@@ -2,6 +2,8 @@ const blockAdsCheckbox = document.getElementById('ad-block-toggle');
 const blockAdTrackersCheckbox = document.querySelector('.block-ad-trackers input[type="checkbox"]');
 const blockAdsButton = document.querySelector('.block-ads span');
 const blockAdTrackersButton = document.querySelector('.block-ad-trackers span');
+const phishDetectionCheckbox = document.getElementById('phish-toggle');
+const phishDetectionButton = document.querySelector('.phish span');
 
 // Initialize settings from Chrome storage
 chrome.storage.sync.get(['adBlockEnabled', 'adTrackerEnabled'], (result) => {
@@ -9,6 +11,21 @@ chrome.storage.sync.get(['adBlockEnabled', 'adTrackerEnabled'], (result) => {
   blockAdTrackersCheckbox.checked = result.adTrackerEnabled || false;
   blockAdsButton.textContent = blockAdsCheckbox.checked ? 'Ads Blocked' : 'Block Ads';
   blockAdTrackersButton.textContent = blockAdTrackersCheckbox.checked ? 'Ad Trackers Blocked' : 'Block Ad Trackers';
+});
+
+// Event listener for blocking/unblocking ads
+phishDetectionCheckbox.addEventListener('change', () => {
+  const isEnabled = phishDetectionCheckbox.checked;
+
+  if (isEnabled) {
+    phishDetectionButton.textContent = 'Phishing Detection OFF';
+           // Call function to enable phish
+  } else {
+    phishDetectionButton.textContent = 'Phishing Detection';
+       // Call function to disable phish
+  }
+
+  
 });
 
 // Event listener for blocking/unblocking ads
@@ -44,11 +61,6 @@ blockAdTrackersCheckbox.addEventListener('change', () => {
 
   // Save the state
   chrome.storage.sync.set({ adTrackerEnabled: isEnabled });
-});
-
-// Back button
-document.querySelector('.back-button').addEventListener('click', () => {
-  window.history.back();
 });
 
 const RULESET_ID = 'ruleset_1';
@@ -142,38 +154,37 @@ async function fetchData() {
 function displayResults(data) {
   const resultElement = document.getElementById('ssl-result');
   const keysToDisplay = [
-    'isvalidCertificate',
-    'canBeSelfSigned',
-    'isWildCard',
-    'isExpired',
-    'message',
-    'expiry',
-    'daysLeft',
-    'lifespanInDays',
-    'issuer',
+    'expiry', 
+    'message', 
+    'issuer' 
   ];
-
+  
   const keysToDisplay1 = [
-    'certDetails',
-    'name',
-    'CN',
-    'hash',
-    'issuer',
-    'C',
-    'O',
-    'version',
-    'serialNumber',
-    'serialNumberHex',
-    'validFrom',
-    'validTo',
-    'validFrom_time_t',
-    'validTo_time_t',
-    'signatureTypeSN',
-    'signatureTypeLN',
-    'signatureTypeNID',
-    'validLeft',
-    'apiVersion',
-    'error'
+    'isExpired', // critical: is the certificate expired?
+    'isvalidCertificate', // critical: is the certificate valid?
+    'daysLeft', // important: how many days are left until expiration?
+    'lifespanInDays', // important: what is the certificate's lifespan?
+    'isWildCard', // informative: is the certificate a wildcard certificate?
+    'canBeSelfSigned', // informative: can the certificate be self-signed?
+    'certDetails', // detailed information about the certificate
+    'name', // certificate name
+    'CN', // common name
+    'hash', // certificate hash
+    'C', // country
+    'O', // organization
+    'version', // certificate version
+    'serialNumber', // serial number
+    'serialNumberHex', // serial number in hexadecimal
+    'validFrom', // when the certificate is valid from
+    'validTo', // when the certificate is valid to
+    'validFrom_time_t', // valid from timestamp
+    'validTo_time_t', // valid to timestamp
+    'signatureTypeSN', // signature type short name
+    'signatureTypeLN', // signature type long name
+    'signatureTypeNID', // signature type NID
+    'validLeft', // number of days left until expiration (alternative to daysLeft)
+    'apiVersion', // API version
+    'error' // error message (if any)
   ];
 
   const displayData = (data, keys) => {
