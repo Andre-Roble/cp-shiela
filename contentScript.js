@@ -55,8 +55,29 @@ function addStyles() {
   document.head.appendChild(styleSheet);
 }
 
-addStyles();
+function init() {
+  addStyles();
+  removeAdElements();
+  removeAnalyticsElements();
 
+  // Optionally, observe changes to handle dynamic content
+  const observer = new MutationObserver(mutations => {
+    mutations.forEach(mutation => {
+      removeAdElements();
+      removeAnalyticsElements();
+    });
+  });
+
+  // Observe the entire document for changes
+  observer.observe(document.body, { childList: true, subtree: true });
+}
+
+// Wait for the DOM to load before executing the script
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}
 
 // Function to remove specific ad elements
 function removeAdElements() {
@@ -77,18 +98,6 @@ function removeAdElements() {
     document.querySelectorAll(selector).forEach(el => el.remove());
   });
 }
-
-removeAdElements();
-
-// Optionally, observe changes to handle dynamic content
-const observer = new MutationObserver(mutations => {
-  mutations.forEach(mutation => {
-    removeAdElements();
-  });
-});
-
-// Observe the entire document for changes
-observer.observe(document.body, { childList: true, subtree: true });
 
 function removeAnalyticsElements() {
   const analyticsDomains = [
@@ -115,5 +124,3 @@ function removeAnalyticsElements() {
     }
   });
 }
-
-removeAnalyticsElements();
