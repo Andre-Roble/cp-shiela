@@ -58,12 +58,6 @@ blockAdTrackersCheckbox.addEventListener('change', () => {
   }
 });
 
-// Back button
-document.querySelector('.back-button').addEventListener('click', () => {
-  // Add your logic here to go back to the previous page
-  window.history.back();
-});
-
 
 const RULESET_ID = 'ruleset_1';
 
