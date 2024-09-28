@@ -13,7 +13,7 @@ chrome.storage.sync.get(['adBlockEnabled', 'adTrackerEnabled'], (result) => {
   blockAdTrackersButton.textContent = blockAdTrackersCheckbox.checked ? 'Ad Trackers Blocked' : 'Block Ad Trackers';
 });
 
-// Event listener for blocking/unblocking ads
+// Event listener for Phishing
 phishDetectionCheckbox.addEventListener('change', () => {
   const isEnabled = phishDetectionCheckbox.checked;
 
@@ -49,19 +49,21 @@ blockAdsCheckbox.addEventListener('change', () => {
 
 // Event listener for blocking/unblocking ad trackers
 blockAdTrackersCheckbox.addEventListener('change', () => {
-  const isEnabled = blockAdTrackersCheckbox.checked;
-
-  if (isEnabled) {
+  if (blockAdTrackersCheckbox.checked) {
     blockAdTrackersButton.textContent = 'Ad Trackers Blocked';
     blockTrackers(); // Call function to block trackers
   } else {
     blockAdTrackersButton.textContent = 'Block Ad Trackers';
     unblockTrackers(); // Call function to unblock trackers
   }
-
-  // Save the state
-  chrome.storage.sync.set({ adTrackerEnabled: isEnabled });
 });
+
+// Back button
+document.querySelector('.back-button').addEventListener('click', () => {
+  // Add your logic here to go back to the previous page
+  window.history.back();
+});
+
 
 const RULESET_ID = 'ruleset_1';
 
@@ -70,7 +72,7 @@ function blockAds() {
   chrome.declarativeNetRequest.updateEnabledRulesets(
     { enableRulesetIds: [RULESET_ID] },
     () => {
-      console.log("Ads have been blocked.");
+      console.log("Ads and trackers have been blocked.");
     }
   );
 }
@@ -80,33 +82,30 @@ function unblockAds() {
   chrome.declarativeNetRequest.updateEnabledRulesets(
     { disableRulesetIds: [RULESET_ID] },
     () => {
-      console.log("Ads have been unblocked.");
+      console.log("Ads and trackers have been unblocked.");
     }
   );
 }
 
 // Function to block ad trackers using specific URL patterns
 function blockTrackers() {
-  chrome.declarativeNetRequest.updateDynamicRules({
-    addRules: [
-      { id: 11, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.google-analytics.com/*", resourceTypes: ["script", "xmlhttprequest"] } },
-      { id: 12, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.facebook.com/*", resourceTypes: ["script", "xmlhttprequest"] } },
-      { id: 13, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.googletagmanager.com/*", resourceTypes: ["script", "xmlhttprequest"] } },
-      { id: 14, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.scorecardresearch.com/*", resourceTypes: ["script", "xmlhttprequest"] } },
-      { id: 15, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.doubleclick.net/*", resourceTypes: ["script", "xmlhttprequest"] } },
-      { id: 16, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.adservice.google.com/*", resourceTypes: ["script", "xmlhttprequest"] } },
-      { id: 17, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.quantserve.com/*", resourceTypes: ["script", "xmlhttprequest"] } },
-      { id: 18, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.pinterest.com/*", resourceTypes: ["script", "xmlhttprequest"] } },
-      { id: 19, priority: 1, action: { type: "block" }, condition: { urlFilter: "*://*.linkedin.com/*", resourceTypes: ["script", "xmlhttprequest"] } }
-    ],
-    removeRuleIds: Array.from({ length: 11 }, (_, i) => 11 + i) // Remove corresponding unblock rules
+  // Enable the ad/tracker blocking rules from the rules.json file
+  chrome.declarativeNetRequest.updateEnabledRulesets({
+    enableRulesetIds: ['ruleset_1'], // 'ruleset_1' is defined in rules.json
+    disableRulesetIds: [] // No rulesets to disable
+  }, () => {
+    console.log('Tracking/ad blocking rules from rules.json enabled.');
   });
 }
 
 // Function to unblock ad trackers
 function unblockTrackers() {
-  chrome.declarativeNetRequest.updateDynamicRules({
-    removeRuleIds: Array.from({ length: 11 }, (_, i) => 11 + i)
+  // Disable the ad/tracker blocking rules from the rules.json file
+  chrome.declarativeNetRequest.updateEnabledRulesets({
+    enableRulesetIds: [], // No rulesets to enable
+    disableRulesetIds: ['ruleset_1'] // 'ruleset_1' is the ID for the rules defined in rules.json
+  }, () => {
+    console.log('Tracking/ad blocking rules from rules.json disabled.');
   });
 }
 
