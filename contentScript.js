@@ -59,12 +59,14 @@ function init() {
   addStyles();
   removeAdElements();
   removeAnalyticsElements();
+  removeAdBlockerNotification();
 
   // Optionally, observe changes to handle dynamic content
   const observer = new MutationObserver(mutations => {
     mutations.forEach(mutation => {
       removeAdElements();
       removeAnalyticsElements();
+      removeAdBlockerNotification(); // Call to remove the ad-blocker message
     });
   });
 
@@ -123,4 +125,14 @@ function removeAnalyticsElements() {
       el.style.display = 'none';
     }
   });
+}
+
+// Function to remove the ad-blocker detection message
+function removeAdBlockerNotification() {
+  // Replace this selector with the actual class or ID of the notification element
+  const notificationSelector = '.ad-blocker-message, .ad-notification'; // Example class, modify as needed
+  const notification = document.querySelector(notificationSelector);
+  if (notification) {
+    notification.remove(); // Remove the notification element
+  }
 }
