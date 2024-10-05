@@ -1,5 +1,5 @@
 const blockAdsCheckbox = document.getElementById('ad-block-toggle');
-const blockAdTrackersCheckbox = document.querySelector('.block-ad-trackers input[type="checkbox"]');
+const blockAdTrackersCheckbox = document.getElementById('ad-tracker-toggle');
 const blockAdsButton = document.querySelector('.block-ads span');
 const blockAdTrackersButton = document.querySelector('.block-ad-trackers span');
 const phishDetectionCheckbox = document.getElementById('phish-toggle');
@@ -49,13 +49,21 @@ blockAdsCheckbox.addEventListener('change', () => {
 
 // Event listener for blocking/unblocking ad trackers
 blockAdTrackersCheckbox.addEventListener('change', () => {
-  if (blockAdTrackersCheckbox.checked) {
+  const isEnabled = blockAdTrackersCheckbox.checked;
+
+  if (isEnabled) {
     blockAdTrackersButton.textContent = 'Ad Trackers Blocked';
     blockTrackers(); // Call function to block trackers
   } else {
     blockAdTrackersButton.textContent = 'Block Ad Trackers';
     unblockTrackers(); // Call function to unblock trackers
   }
+
+    // Send message to background script to enable/disable ad blocking
+    chrome.runtime.sendMessage({ action: 'toggleAdTrackers', enabled: isEnabled });
+
+    // Save the state
+    chrome.storage.sync.set({ adTrackerEnabled: isEnabled });
 });
 
 

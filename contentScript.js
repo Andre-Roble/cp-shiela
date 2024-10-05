@@ -1,138 +1,58 @@
-const styles = `
-  /* Hide known analytics and tracking services */
-  iframe[src*="hotjar.com"], iframe[src*="yandex.ru"], iframe[src*="yandex.net"], 
-  iframe[src*="googletagmanager.com"], iframe[src*="doubleclick.net"], 
-  iframe[src*="adsafeprotected.com"], iframe[src*="track.adform.net"], 
-  iframe[src*="data.ampproject.org"], iframe[src*="safeframe.googlesyndication.com"], 
-  iframe[src*="www.googletagmanager.com"], iframe[src*="www.google-analytics.com"],
-  iframe[src*="www.hotjar.com"], iframe[src*="static.hotjar.com"], 
-  iframe[src*="static.yandex.net"], iframe[src*="cdn.jsdelivr.net"] {
-    display: none !important;
-  }
-  img[src*="hotjar.com"], img[src*="yandex.ru"], img[src*="yandex.net"], 
-  img[src*="googletagmanager.com"], img[src*="doubleclick.net"], 
-  img[src*="adsafeprotected.com"], img[src*="track.adform.net"], 
-  img[src*="static.hotjar.com"], img[src*="static.yandex.net"] {
-    display: none !important;
-  }
-  script[src*="hotjar.com"], script[src*="yandex.ru"], script[src*="yandex.net"], 
-  script[src*="googletagmanager.com"], script[src*="doubleclick.net"], 
-  script[src*="adsafeprotected.com"], script[src*="track.adform.net"], 
-  script[src*="static.hotjar.com"], script[src*="static.yandex.net"] {
-    display: none !important;
-  }
-  /* Hide common ad containers */
-  .ad-banner, .ad-container, .adsbygoogle, .sponsored, .ad, .advertisement {
-    display: none !important;
-  }
+// Function to fetch the rules from rules.json
+async function fetchRules() {
+  const rulesUrl = chrome.runtime.getURL('rules.json');
+  console.log('Fetching rules from:', rulesUrl);
 
-  /* Hide Flash banners */
-  embed[type="application/x-shockwave-flash"],
-  object[data$=".swf"] {
-    display: none !important;
-  }
+  try {
+      const response = await fetch(rulesUrl);
+      if (!response.ok) {
+          throw new Error('Network response was not ok, status: ' + response.status);
+      }
+      
+      const rules = await response.json();
+      console.log('Fetched rules:', rules); // Log the fetched rules
 
-  /* Hide GIF images */
-  img[src$=".gif"] {
-    display: none !important;
+      // Check if rules is an array and map urlFilter
+      if (Array.isArray(rules)) {
+          return rules.map(rule => rule.condition.urlFilter); // Extracting the urlFilter values
+      } else {
+          console.error("Invalid rules structure:", rules);
+          return []; // Return an empty array if structure is invalid
+      }
+  } catch (error) {
+      console.error("Failed to fetch rules:", error);
+      return [];
   }
-
-  /* Hide static images from known ad servers */
-  img[src*="banner"],
-  img[src*="advert"],
-  img[src*="ad"],
-  img[src*="ad-image"],
-  img[src*="advertisement"],
-  img[src*="promotion"] {
-    display: none !important;
-  }
-`;
-
-function addStyles() {
-  const styleSheet = document.createElement("style");
-  styleSheet.type = "text/css";
-  styleSheet.innerText = styles;
-  document.head.appendChild(styleSheet);
 }
 
-function init() {
-  addStyles();
-  removeAdElements();
-  removeAnalyticsElements();
-  removeAdBlockerNotification();
+// Function to check if a URL matches any of the blocked URLs
+function isBlockedUrl(url, blockedUrls) {
+  return blockedUrls.some(blockedUrl => url.includes(blockedUrl));
+}
 
-  // Optionally, observe changes to handle dynamic content
-  const observer = new MutationObserver(mutations => {
-    mutations.forEach(mutation => {
-      removeAdElements();
-      removeAnalyticsElements();
-      removeAdBlockerNotification(); // Call to remove the ad-blocker message
-    });
+// Function to hide blocked ad elements
+function hideBlockedAds(blockedUrls) {
+  const elements = document.querySelectorAll('a, img, iframe, div'); // Customize selectors as needed
+
+  elements.forEach(element => {
+      if (
+          (element.src && isBlockedUrl(element.src, blockedUrls)) || 
+          (element.href && isBlockedUrl(element.href, blockedUrls)) ||
+          (element.dataset && Object.values(element.dataset).some(val => isBlockedUrl(val, blockedUrls))) || 
+          (element.className && isBlockedUrl(element.className, blockedUrls))
+      ) {
+          console.log(`Hiding element: ${element.outerHTML}`); // Log the hidden element
+          element.style.display = 'none'; // Hide the element
+      }
   });
+}
 
-  // Observe the entire document for changes
+// Main execution using an Immediately Invoked Function Expression (IIFE)
+(async () => {
+  const blockedUrls = await fetchRules(); // Fetch the blocked URLs
+  hideBlockedAds(blockedUrls); // Hide ads initially
+
+  // Observe changes in the DOM to catch dynamically loaded ads
+  const observer = new MutationObserver(() => hideBlockedAds(blockedUrls));
   observer.observe(document.body, { childList: true, subtree: true });
-}
-
-// Wait for the DOM to load before executing the script
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", init);
-} else {
-  init();
-}
-
-// Function to remove specific ad elements
-function removeAdElements() {
-  const adSelectors = [
-    'iframe[src*="ads"]',
-    'iframe[src*="ad"]',
-    'iframe[src*="banner"]',
-    'iframe[src*="advert"]',
-    'iframe[src*="ad-image"]',
-    'img[src*="ads"]',
-    'img[src*="ad"]',
-    'img[src*="banner"]',
-    'img[src*="advert"]',
-    'img[src*="ad-image"]'
-  ];
-
-  adSelectors.forEach(selector => {
-    document.querySelectorAll(selector).forEach(el => el.remove());
-  });
-}
-
-function removeAnalyticsElements() {
-  const analyticsDomains = [
-    "hotjar.com",
-    "yandex.ru",
-    "yandex.net",
-    "googletagmanager.com",
-    "doubleclick.net",
-    "adsafeprotected.com",
-    "track.adform.net",
-    "data.ampproject.org",
-    "safeframe.googlesyndication.com",
-    "www.googletagmanager.com",
-    "www.google-analytics.com",
-    "static.hotjar.com",
-    "static.yandex.net",
-    "cdn.jsdelivr.net"
-  ];
-
-  document.querySelectorAll('iframe, img, script').forEach(el => {
-    if (analyticsDomains.some(domain => (el.src && el.src.includes(domain)) ||
-                                         (el.href && el.href.includes(domain)))) {
-      el.style.display = 'none';
-    }
-  });
-}
-
-// Function to remove the ad-blocker detection message
-function removeAdBlockerNotification() {
-  // Replace this selector with the actual class or ID of the notification element
-  const notificationSelector = '.ad-blocker-message, .ad-notification'; // Example class, modify as needed
-  const notification = document.querySelector(notificationSelector);
-  if (notification) {
-    notification.remove(); // Remove the notification element
-  }
-}
+})();
