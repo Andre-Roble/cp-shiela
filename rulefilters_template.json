@@ -1,0 +1,9 @@
+{
+    "priority": 1,
+    "action": { "type": "block" },
+    "condition": {
+      "urlFilter": "",
+      "resourceTypes": ["main_frame", "sub_frame", "stylesheet", "script", "image", "xmlhttprequest", "media", "font", "ping"]
+    }
+  }
+  

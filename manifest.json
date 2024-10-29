@@ -31,7 +31,7 @@
       {
         "id": "ruleset_1",
         "enabled": true,
-        "path": "rules.json"
+        "path": "rulefilters.json"
       }
     ]
   },
@@ -44,7 +44,7 @@
 ],
 "web_accessible_resources": [
   {
-    "resources": ["rules.json"],
+    "resources": ["rulefilters.json"],
     "matches": ["https://*/*", "http://*/*"]
   }
 ]

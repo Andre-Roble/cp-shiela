@@ -1,6 +1,6 @@
-// Function to fetch the rules from rules.json
+// Function to fetch the rules from rulefilters.json
 async function fetchRules() {
-  const rulesUrl = chrome.runtime.getURL('rules.json');
+  const rulesUrl = chrome.runtime.getURL('rulefilters.json');
   console.log('Fetching rules from:', rulesUrl);
 
   try {
