@@ -9,11 +9,14 @@
     "activeTab",
     "tabs",
     "storage",
-    "scripting"
+    "scripting",
+    "windows",
+    "notifications"
   ],
   "host_permissions": [
     "https://*/*",
-    "http://*/*"],
+    "http://*/*"
+  ],
   "background": {
     "service_worker": "background.js"
   },
@@ -45,6 +48,10 @@
 "web_accessible_resources": [
   {
     "resources": ["rulefilters.json"],
+    "matches": ["https://*/*", "http://*/*"]
+  },
+  {
+    "resources": ["warning.html", "warning.js"],
     "matches": ["https://*/*", "http://*/*"]
   }
 ]

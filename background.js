@@ -178,3 +178,32 @@ chrome.action.onClicked.addListener(() => {
     }
   });
 });
+
+//https 11/5
+function notification(url) {
+  if (url.includes('/search') || url.includes('?q=')) {
+    return;
+  }
+
+  if (url.startsWith('http://')) {
+    chrome.notifications.create({
+      title: 'SHIELA',
+      message: `You are visiting an unsecure site: ${url}`,
+      iconUrl: 'src/bs-img.png',
+      type: 'basic'
+    });
+  } else if (url.startsWith('https://')) {
+    chrome.notifications.create({
+      title: 'SHIELA',
+      message: `You are visiting a secure site: ${url}`,
+      iconUrl: 'src/bs-img.png',
+      type: 'basic'
+    });
+  }
+}
+
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+  if (changeInfo.status === 'complete') {
+    notification(tab.url);
+  }
+});
