@@ -21,15 +21,11 @@ const phishDetectionButton = document.querySelector('.phish span');
 chrome.storage.sync.get('phishingDetectionEnabled', (data) => {
   const isEnabled = data.phishingDetectionEnabled || false;
   phishDetectionCheckbox.checked = isEnabled;
-  phishDetectionCheckbox.nextElementSibling.textContent = isEnabled ? 'Phishing Detection ON' : 'Phishing Detection OFF';
 });
 
 // Event listener for Phishing Detection toggle
 phishDetectionCheckbox.addEventListener('change', async () => {
   const isEnabled = phishDetectionCheckbox.checked;
-
-  // Update button text based on the toggle state
-  phishDetectionCheckbox.nextElementSibling.textContent = isEnabled ? 'Phishing Detection ON' : 'Phishing Detection OFF';
 
   // Save the toggle state in Chrome's storage
   chrome.storage.sync.set({ phishingDetectionEnabled: isEnabled });
