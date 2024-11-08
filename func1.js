@@ -2,8 +2,6 @@ const blockAdsCheckbox = document.getElementById('ad-block-toggle');
 const blockAdTrackersCheckbox = document.getElementById('ad-tracker-toggle');
 const blockAdsButton = document.querySelector('.block-ads span');
 const blockAdTrackersButton = document.querySelector('.block-ad-trackers span');
-const phishDetectionCheckbox = document.getElementById('phish-toggle');
-const phishDetectionButton = document.querySelector('.phish span');
 
 // Initialize settings from Chrome storage
 chrome.storage.sync.get(['adBlockEnabled', 'adTrackerEnabled'], (result) => {
@@ -13,20 +11,57 @@ chrome.storage.sync.get(['adBlockEnabled', 'adTrackerEnabled'], (result) => {
   blockAdTrackersButton.textContent = blockAdTrackersCheckbox.checked ? 'Ad Trackers Blocked' : 'Block Ad Trackers';
 });
 
-// Event listener for Phishing
-phishDetectionCheckbox.addEventListener('change', () => {
+// Get the phishing detection checkbox and button using unique IDs
+const phishDetectionCheckbox = document.getElementById('phish-toggle');
+// const phishDetectionCheckbox = document.getElementById('phish-toggle');
+const phishDetectionButton = document.querySelector('.phish span');
+
+
+// Retrieve the toggle state from Chrome's storage on load for phishing detection
+chrome.storage.sync.get('phishingDetectionEnabled', (data) => {
+  const isEnabled = data.phishingDetectionEnabled || false;
+  phishDetectionCheckbox.checked = isEnabled;
+  phishDetectionCheckbox.nextElementSibling.textContent = isEnabled ? 'Phishing Detection ON' : 'Phishing Detection OFF';
+});
+
+// Event listener for Phishing Detection toggle
+phishDetectionCheckbox.addEventListener('change', async () => {
   const isEnabled = phishDetectionCheckbox.checked;
 
-  if (isEnabled) {
-    phishDetectionButton.textContent = 'Phishing Detection OFF';
-           // Call function to enable phish
-  } else {
-    phishDetectionButton.textContent = 'Phishing Detection';
-       // Call function to disable phish
-  }
+  // Update button text based on the toggle state
+  phishDetectionCheckbox.nextElementSibling.textContent = isEnabled ? 'Phishing Detection ON' : 'Phishing Detection OFF';
 
-  
+  // Save the toggle state in Chrome's storage
+  chrome.storage.sync.set({ phishingDetectionEnabled: isEnabled });
+
+  if (isEnabled) {
+    enablePhishDetection();
+  } else {
+    disablePhishDetection();
+  }
 });
+
+// Function to enable phishing detection
+function enablePhishDetection() {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    const url = tabs[0].url;  // Get the current tab's URL
+
+    // Send a message to background.js to check if the site is phishing
+    chrome.runtime.sendMessage({ action: 'checkPhishing', url: url }, (response) => {
+      if (response.isPhishing) {
+        const threatType = response.threatType || 'SOCIAL_ENGINEERING';
+        const warningUrl = chrome.runtime.getURL(`warning.html?threatType=${threatType}&url=${encodeURIComponent(url)}`);
+        chrome.tabs.update(tabs[0].id, { url: warningUrl });
+      }
+    });
+  });
+}
+
+// Function to disable phishing detection
+function disablePhishDetection() {
+  console.log('Phishing detection disabled.');
+}
+
 
 // Event listener for blocking/unblocking ads
 blockAdsCheckbox.addEventListener('change', () => {

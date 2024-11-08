@@ -5,15 +5,18 @@
   "description": "SHIELA will provide users with SSL certificate verification, ensuring secure connection through HTTPS enforcement, phishing site detection, enforced ad blocking, blacklisting URL analysis, and alerts and warnings.",
   "permissions": [
     "declarativeNetRequest",
+    "declarativeNetRequestWithHostAccess",
     "declarativeNetRequestFeedback",
     "activeTab",
     "tabs",
     "storage",
     "scripting",
     "windows",
-    "notifications"
+    "notifications",
+    "webNavigation"
   ],
   "host_permissions": [
+    "*://*/*",
     "https://*/*",
     "http://*/*"
   ],
@@ -48,10 +51,6 @@
 "web_accessible_resources": [
   {
     "resources": ["rulefilters.json"],
-    "matches": ["https://*/*", "http://*/*"]
-  },
-  {
-    "resources": ["warning.html", "warning.js"],
     "matches": ["https://*/*", "http://*/*"]
   }
 ]

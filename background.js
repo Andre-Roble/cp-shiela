@@ -129,13 +129,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 // Function to check a URL against Google Safe Browsing API
 async function checkPhishing(url) {
-  const apiKey = 'AIzaSyD6pJ_-v9cFVDkuIvMJsiZk2nlYRF98bOM'; // Replace with your actual API key
+  const apiKey = 'AIzaSyD6pJ_-v9cFVDkuIvMJsiZk2nlYRF98bOM'; // Your actual API key
   const endpoint = `https://safebrowsing.googleapis.com/v4/threatMatches:find?key=${apiKey}`;
+
   const body = {
-    client: {
-      clientId: 'SHIELA',
-      clientVersion: '1.0',
-    },
+    client: { clientId: 'SHIELA', clientVersion: '1.0' },
     threatInfo: {
       threatTypes: ['MALWARE', 'SOCIAL_ENGINEERING'],
       platformTypes: ['ANY_PLATFORM'],
@@ -144,19 +142,57 @@ async function checkPhishing(url) {
     },
   };
 
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(body),
-  });
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
 
-  const data = await response.json();
+    const data = await response.json();
+    console.log("API response data:", data);
 
-  // Return true if phishing is detected
-  return data && data.matches && data.matches.length > 0;
+    if (data && data.matches && data.matches.length > 0) {
+      console.log("Threat detected:", data.matches[0]);
+      const threatType = data.matches[0].threatType;
+      return { isPhishing: true, threatType };
+    } else {
+      console.log("No phishing detected for this URL");
+      return { isPhishing: false };
+    }
+  } catch (error) {
+    console.error('Error during API request:', error);
+    return { isPhishing: false };
+  }
 }
+
+// Conditionally add a webNavigation listener if available
+if (chrome.webNavigation && chrome.webNavigation.onCompleted) {
+  chrome.webNavigation.onCompleted.addListener(async (details) => {
+    const url = details.url;
+
+    chrome.storage.sync.get('phishingDetectionEnabled', async (data) => {
+      if (data.phishingDetectionEnabled) {
+        const result = await checkPhishing(url);
+        if (result.isPhishing) {
+          const threatType = result.threatType;
+          const warningUrl = chrome.runtime.getURL(`warning.html?threatType=${threatType}&url=${encodeURIComponent(url)}`);
+          chrome.tabs.update(details.tabId, { url: warningUrl });
+        }
+      }
+    });
+  }, { url: [{ schemes: ["http", "https"] }] });
+} else {
+  console.warn('chrome.webNavigation API is not available.');
+}
+
+// Listen for messages from func1.js
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'checkPhishing') {
+    checkPhishing(message.url).then(result => sendResponse(result));
+    return true;
+  }
+});
 
 // Listen for action button click to toggle ad blocking and tracker blocking
 chrome.action.onClicked.addListener(() => {
