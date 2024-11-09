@@ -3,26 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pop Up Alert/Warning</title>
-  <style>
-    .warning {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      margin: 20px;
-      border: 2px solid red;
-      background-color: #f8d7da;
-      color: #721c24;
-    }
-  </style>
+  <title>Warning: Important Message</title>
+  <link rel="stylesheet" href="style-1.css">
 </head>
-<body>
-  <div id="alert-box" class="warning">
+<body id="warning-body" class="warning-body">
+  <header class="warning-header">
+    <h1 class="warning-title">&#9888; WARNING!</h1>
+  </header>
+  <div class="warning-content">
     <p id="alert-message"></p>
   </div>
-  
-  <button id="go-back-button">Go Back</button>
-
-  <!-- Link to warning.js -->
+  <div class="button-container">
+    <button class="back-button">Return To Safety</button>
+    <button class="details-button">More Details</button>
+  </div>
   <script src="warning.js"></script>
 </body>
 </html>
