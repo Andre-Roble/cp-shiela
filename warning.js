@@ -16,7 +16,7 @@ if (threatType === 'MALWARE') {
 }
 
 // Get the "Go Back" button by its ID and add event listener for "Go Back" functionality
-const goBackButton = document.getElementById('go-back-button');
+const goBackButton = document.getElementById('back-button');
 goBackButton.addEventListener('click', () => {
   if (siteUrl) {
     // Get the currently active tab and navigate back to the original URL
@@ -26,3 +26,5 @@ goBackButton.addEventListener('click', () => {
     });
   }
 });
+
+//add details button func
