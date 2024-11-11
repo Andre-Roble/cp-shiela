@@ -1,5 +1,6 @@
 console.log('Background JS is running');
 
+//----------AD BLOCKING / AD TRACKER BLOCKING--------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Basic setup to test if the script runs without issues
 chrome.runtime.onStartup.addListener(() => {
   console.log('Extension started');
@@ -127,9 +128,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
+//----------PHISHING DETECTION-----------------------------------------------------------------------------------------------------------------------------------------------
+
 // Function to check a URL against Google Safe Browsing API
 async function checkPhishing(url) {
-  const apiKey = 'AIzaSyD6pJ_-v9cFVDkuIvMJsiZk2nlYRF98bOM'; // Your actual API key
+  const apiKey = 'AIzaSyD6pJ_-v9cFVDkuIvMJsiZk2nlYRF98bOM';  // Your actual API key
   const endpoint = `https://safebrowsing.googleapis.com/v4/threatMatches:find?key=${apiKey}`;
 
   const body = {
@@ -166,19 +169,29 @@ async function checkPhishing(url) {
   }
 }
 
-// Conditionally add a webNavigation listener if available
+// Add webNavigation listener to check each URL
 if (chrome.webNavigation && chrome.webNavigation.onCompleted) {
   chrome.webNavigation.onCompleted.addListener(async (details) => {
     const url = details.url;
 
+    // Check if phishing detection is enabled
     chrome.storage.sync.get('phishingDetectionEnabled', async (data) => {
       if (data.phishingDetectionEnabled) {
+        console.log("Phishing detection enabled, checking URL:", url);
+        
+        // Run phishing check
         const result = await checkPhishing(url);
+
+        // Only prompt warning if phishing is detected
         if (result.isPhishing) {
           const threatType = result.threatType;
           const warningUrl = chrome.runtime.getURL(`warning.html?threatType=${threatType}&url=${encodeURIComponent(url)}`);
           chrome.tabs.update(details.tabId, { url: warningUrl });
+        } else {
+          console.log("No phishing detected, no warning page displayed.");
         }
+      } else {
+        console.log("Phishing detection is not enabled.");
       }
     });
   }, { url: [{ schemes: ["http", "https"] }] });
@@ -186,13 +199,15 @@ if (chrome.webNavigation && chrome.webNavigation.onCompleted) {
   console.warn('chrome.webNavigation API is not available.');
 }
 
-// Listen for messages from func1.js
+// Listen for messages from func1.js to check phishing on demand
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'checkPhishing') {
     checkPhishing(message.url).then(result => sendResponse(result));
-    return true;
+    return true;  // Keeps the message channel open for async response
   }
 });
+
+
 
 // Listen for action button click to toggle ad blocking and tracker blocking
 chrome.action.onClicked.addListener(() => {
@@ -215,7 +230,7 @@ chrome.action.onClicked.addListener(() => {
   });
 });
 
-//https 11/5
+//----------HTTPS ENFORCEMENT-----------------------------------------------------------------------------------------------------------------------------------------------
 function notification(url) {
   if (url.includes('/search') || url.includes('?q=')) {
     return;
@@ -225,13 +240,6 @@ function notification(url) {
     chrome.notifications.create({
       title: 'SHIELA',
       message: `You are visiting an unsecure site: ${url}`,
-      iconUrl: 'src/bs-img.png',
-      type: 'basic'
-    });
-  } else if (url.startsWith('https://')) {
-    chrome.notifications.create({
-      title: 'SHIELA',
-      message: `You are visiting a secure site: ${url}`,
       iconUrl: 'src/bs-img.png',
       type: 'basic'
     });

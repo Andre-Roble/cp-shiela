@@ -13,9 +13,10 @@ chrome.storage.sync.get(['adBlockEnabled', 'adTrackerEnabled'], (result) => {
 
 // Get the phishing detection checkbox and button using unique IDs
 const phishDetectionCheckbox = document.getElementById('phish-toggle');
-// const phishDetectionCheckbox = document.getElementById('phish-toggle');
 const phishDetectionButton = document.querySelector('.phish span');
 
+// Variable to prevent multiple concurrent phishing checks
+let isPhishCheckInProgress = false;
 
 // Retrieve the toggle state from Chrome's storage on load for phishing detection
 chrome.storage.sync.get('phishingDetectionEnabled', (data) => {
@@ -23,8 +24,17 @@ chrome.storage.sync.get('phishingDetectionEnabled', (data) => {
   phishDetectionCheckbox.checked = isEnabled;
 });
 
-// Event listener for Phishing Detection toggle
-phishDetectionCheckbox.addEventListener('change', async () => {
+// Debounce function to prevent rapid toggling
+function debounce(func, delay) {
+  let timeoutId;
+  return function (...args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
+// Event listener for Phishing Detection toggle with debounced handler
+phishDetectionCheckbox.addEventListener('change', debounce(async () => {
   const isEnabled = phishDetectionCheckbox.checked;
 
   // Save the toggle state in Chrome's storage
@@ -35,20 +45,39 @@ phishDetectionCheckbox.addEventListener('change', async () => {
   } else {
     disablePhishDetection();
   }
-});
+}, 300));  // Adjust debounce delay as needed
 
 // Function to enable phishing detection
 function enablePhishDetection() {
+  if (isPhishCheckInProgress) return;  // Prevent concurrent phishing checks
+
+  isPhishCheckInProgress = true;
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (!tabs || !tabs[0]) {
+      console.error("No active tab found.");  // Log error if no active tab
+      isPhishCheckInProgress = false;
+      return;
+    }
+
     const url = tabs[0].url;  // Get the current tab's URL
+    console.log("Checking URL for phishing:", url); // Log URL check
 
     // Send a message to background.js to check if the site is phishing
     chrome.runtime.sendMessage({ action: 'checkPhishing', url: url }, (response) => {
-      if (response.isPhishing) {
+      console.log("Phishing check response:", response);  // Log response for debugging
+
+      // Only proceed if the response explicitly indicates phishing
+      if (response && response.isPhishing === true) {
         const threatType = response.threatType || 'SOCIAL_ENGINEERING';
         const warningUrl = chrome.runtime.getURL(`warning.html?threatType=${threatType}&url=${encodeURIComponent(url)}`);
+        console.log("Redirecting to warning page:", warningUrl); // Log redirection
         chrome.tabs.update(tabs[0].id, { url: warningUrl });
+      } else {
+        console.log("No phishing detected, no warning page displayed."); // Log no warning
       }
+      
+      // Reset flag after check is complete
+      isPhishCheckInProgress = false;
     });
   });
 }
@@ -57,6 +86,7 @@ function enablePhishDetection() {
 function disablePhishDetection() {
   console.log('Phishing detection disabled.');
 }
+
 
 
 // Event listener for blocking/unblocking ads
