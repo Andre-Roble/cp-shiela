@@ -169,32 +169,57 @@ async function checkPhishing(url) {
   }
 }
 
+// Helper function to determine severity based on threatType (you can customize it further)
+function determineSeverity(threatType) {
+  // For example, if 'MALWARE' is detected, consider it more severe
+  if (threatType === 'MALWARE') {
+    return 'Critical';
+  } else if (threatType === 'SOCIAL_ENGINEERING') {
+    return 'Risky';
+  } else {
+    return 'Low';
+  }
+}
+
 // Add webNavigation listener to check each URL
 if (chrome.webNavigation && chrome.webNavigation.onCompleted) {
   chrome.webNavigation.onCompleted.addListener(async (details) => {
     const url = details.url;
-
+  
     // Check if phishing detection is enabled
     chrome.storage.sync.get('phishingDetectionEnabled', async (data) => {
       if (data.phishingDetectionEnabled) {
         console.log("Phishing detection enabled, checking URL:", url);
-        
-        // Run phishing check
-        const result = await checkPhishing(url);
-
-        // Only prompt warning if phishing is detected
-        if (result.isPhishing) {
-          const threatType = result.threatType;
-          const warningUrl = chrome.runtime.getURL(`warning.html?threatType=${threatType}&url=${encodeURIComponent(url)}`);
-          chrome.tabs.update(details.tabId, { url: warningUrl });
+  
+        // Submit URL to VirusTotal for scanning
+        const urlId = await submitUrlForScanning(url);
+        if (urlId) {
+          // Retrieve analysis report
+          const report = await getUrlAnalysisReport(urlId);
+          if (report && report.data && report.data.attributes && report.data.attributes.last_analysis_stats) {
+            const stats = report.data.attributes.last_analysis_stats;
+            // Check if there are any detections
+            if (stats.malicious > 0 || stats.suspicious > 0) {
+              console.log("Threat detected by VirusTotal:", report);
+  
+              // Construct the warning page URL
+              const warningUrl = chrome.runtime.getURL(`warning.html?threatType=VirusTotalDetected&url=${encodeURIComponent(url)}`);
+              chrome.tabs.update(details.tabId, { url: warningUrl });
+            } else {
+              console.log("No threats detected by VirusTotal.");
+            }
+          } else {
+            console.log("No detailed report found for URL on VirusTotal.");
+          }
         } else {
-          console.log("No phishing detected, no warning page displayed.");
+          console.log("Failed to submit URL to VirusTotal.");
         }
       } else {
         console.log("Phishing detection is not enabled.");
       }
     });
   }, { url: [{ schemes: ["http", "https"] }] });
+  
 } else {
   console.warn('chrome.webNavigation API is not available.');
 }
@@ -229,6 +254,111 @@ chrome.action.onClicked.addListener(() => {
     }
   });
 });
+
+//----------VirusTotal API--------------------------------------------------------------------------------------------------------------------------------------------------
+// Function to scan a URL using VirusTotal API
+async function submitUrlForScanning(url) {
+  const apiKey = '8b0a9c775f34a845c45da5db3136ecf80e8ef7b093d4c345e2329127f1c585f8';  // Replace with your actual VirusTotal API key
+  const endpoint = 'https://www.virustotal.com/api/v3/urls';
+
+  const body = new URLSearchParams();
+  body.append('url', url);
+
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'x-apikey': apiKey,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: body
+    });
+    const data = await response.json();
+    if (data && data.data && data.data.id) {
+      console.log("VirusTotal URL submitted successfully:", data.data.id);
+      return data.data.id; // This is the URL ID needed for the report
+    } else {
+      console.error("Failed to submit URL to VirusTotal:", data);
+      return null;
+    }
+  } catch (error) {
+    console.error("Error during VirusTotal URL submission:", error);
+    return null;
+  }
+}
+
+// Function to retrieve the VirusTotal analysis report for a URL
+async function getUrlAnalysisReport(urlId) {
+  const apiKey = '8b0a9c775f34a845c45da5db3136ecf80e8ef7b093d4c345e2329127f1c585f8';  // Replace with your actual VirusTotal API key
+  const endpoint = `https://www.virustotal.com/api/v3/urls/${urlId}`;
+
+  try {
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      headers: {
+        'x-apikey': apiKey,
+        'Accept': 'application/json'
+      }
+    });
+    const data = await response.json();
+    console.log("VirusTotal URL Analysis Report:", data);
+    return data;
+  } catch (error) {
+    console.error("Error fetching VirusTotal URL analysis report:", error);
+    return null;
+  }
+}
+
+// Optional: Request a URL rescan from VirusTotal (if needed)
+async function requestUrlRescan(urlId) {
+  const apiKey = '8b0a9c775f34a845c45da5db3136ecf80e8ef7b093d4c345e2329127f1c585f8';  // Replace with your actual VirusTotal API key
+  const endpoint = `https://www.virustotal.com/api/v3/urls/${urlId}/analyse`;
+
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'x-apikey': apiKey,
+        'Accept': 'application/json'
+      }
+    });
+    const data = await response.json();
+    console.log("VirusTotal URL Rescan Requested:", data);
+    return data;
+  } catch (error) {
+    console.error("Error requesting VirusTotal URL rescan:", error);
+    return null;
+  }
+}
+
+//----------Severity/Levels of Threats--------------------------------------------------------------------------------------------------------------------------------------
+// Listen for phishing check and send response with severity
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'checkPhishing') {
+    checkPhishing(message.url).then(result => {
+      if (result.isPhishing) {
+        const threatDetails = {
+          severity: result.severity,  // Get severity from the result
+          category: result.threatType || 'Unknown', // Ensure threatType is passed
+          confidence: 'High'  // You can adjust the confidence as needed
+        };
+
+        const warningUrl = chrome.runtime.getURL(
+          `warning.html?threatType=${result.threatType}&url=${encodeURIComponent(message.url)}&details=${encodeURIComponent(JSON.stringify(threatDetails))}`
+        );
+        sendResponse({ warningUrl });  // Send the warning page URL
+      } else {
+        sendResponse({ message: 'No phishing detected.' });
+      }
+    }).catch(error => {
+      console.error('Phishing check failed:', error);
+      sendResponse({ error: error.message });
+    });
+
+    return true; // Ensure asynchronous response
+  }
+});
+
 
 //----------HTTPS ENFORCEMENT-----------------------------------------------------------------------------------------------------------------------------------------------
 function notification(url) {

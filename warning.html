@@ -13,11 +13,19 @@
   <div class="warning-content">
     <p id="alert-message"></p>
   </div>
+  <div class="details-container" id="details-container" style="display: none;">
+    <h2>Threat Details</h2>
+    <table id="details-table">
+      <tr><th>Detail</th><th>Value</th></tr>
+    </table>
+  </div>
   <div class="button-container">
     <button id="back-button" class="back-button">Return To Safety</button>
-    <button class="details-button">More Details</button>
+    <button id="details-button" class="details-button">More Details</button>
   </div>
+  <div class="severity-container">
+    <h3 id="severity-label"></h3>
+  </div>  
   <script src="warning.js"></script>
-  </body>
 </body>
 </html>

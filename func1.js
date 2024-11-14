@@ -54,38 +54,53 @@ function enablePhishDetection() {
   isPhishCheckInProgress = true;
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (!tabs || !tabs[0]) {
-      console.error("No active tab found.");  // Log error if no active tab
+      console.error("No active tab found.");
       isPhishCheckInProgress = false;
       return;
     }
 
-    const url = tabs[0].url;  // Get the current tab's URL
-    console.log("Checking URL for phishing:", url); // Log URL check
+    const url = tabs[0].url;
+    console.log("Checking URL for threats:", url);
 
-    // Send a message to background.js to check if the site is phishing
-    chrome.runtime.sendMessage({ action: 'checkPhishing', url: url }, (response) => {
-      console.log("Phishing check response:", response);  // Log response for debugging
+    // Send a message to background.js to check if the site is a threat
+    chrome.runtime.sendMessage({ action: 'checkURLWithVirusTotal', url: url }, (response) => {
+      console.log("Threat check response:", response);
 
-      // Only proceed if the response explicitly indicates phishing
-      if (response && response.isPhishing === true) {
-        const threatType = response.threatType || 'SOCIAL_ENGINEERING';
-        const warningUrl = chrome.runtime.getURL(`warning.html?threatType=${threatType}&url=${encodeURIComponent(url)}`);
-        console.log("Redirecting to warning page:", warningUrl); // Log redirection
+      // Handle VirusTotal response
+      if (response && response.isThreat) {
+        const threatLevel = response.threatLevel || 'Unknown';
+        const warningUrl = chrome.runtime.getURL(`warning.html?threatLevel=${threatLevel}&url=${encodeURIComponent(url)}`);
+        console.log("Redirecting to warning page:", warningUrl);
         chrome.tabs.update(tabs[0].id, { url: warningUrl });
       } else {
-        console.log("No phishing detected, no warning page displayed."); // Log no warning
+        console.log("No threat detected, no warning page displayed.");
       }
-      
+
       // Reset flag after check is complete
       isPhishCheckInProgress = false;
     });
   });
 }
 
+
 // Function to disable phishing detection
 function disablePhishDetection() {
   console.log('Phishing detection disabled.');
 }
+
+//handle response
+document.getElementById("phish-toggle").addEventListener("change", (event) => {
+  const enabled = event.target.checked;
+  chrome.runtime.sendMessage({ action: "checkPhishing", url: window.location.href }, (response) => {
+    if (response && response.isPhishing) {
+      console.log("Phishing detected:", response);
+      // Handle phishing detection logic here
+    } else {
+      console.log("No phishing detected.");
+    }
+  });
+});
+
 
 
 
