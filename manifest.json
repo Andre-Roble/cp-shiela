@@ -13,6 +13,7 @@
     "scripting",
     "windows",
     "notifications",
+    "webRequest",
     "webNavigation"
   ],
   "host_permissions": [

@@ -300,3 +300,59 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     notification(tab.url);
   }
 });
+
+
+
+// Listen for SSL-related errors on web requests
+chrome.webRequest.onErrorOccurred.addListener(
+  (details) => {
+    const sslErrors = [
+      "net::ERR_CERT_DATE_INVALID",
+      "net::ERR_CERT_AUTHORITY_INVALID",
+      "net::ERR_CERT_COMMON_NAME_INVALID"
+    ];
+
+    // Check if the error is SSL-related
+    if (sslErrors.includes(details.error)) {
+      console.log(`SSL Error detected on: ${details.url}`);
+
+      // Ensure we're not redirecting the error page itself
+      const errorPageUrl = chrome.runtime.getURL("error.html");
+      if (details.url.startsWith(errorPageUrl)) {
+        console.log("Already on the error page. Skipping redirection.");
+        return;
+      }
+
+      // Skip redirect if the URL contains skipError=true
+      if (details.url.includes("skipError=true")) {
+        console.log("Skipping redirection for:", details.url);
+        return;
+      }
+
+      // Redirect to the error page with the original site URL as a parameter
+      chrome.tabs.get(details.tabId, (tab) => {
+        if (chrome.runtime.lastError) {
+          console.error("Error fetching tab:", chrome.runtime.lastError.message);
+          return;
+        }
+
+        if (!tab) {
+          console.error(`Tab not found for ID: ${details.tabId}`);
+          return;
+        }
+
+        console.log(`Redirecting tab ${details.tabId} to error.html.`);
+        chrome.tabs.update(details.tabId, {
+          url: `${errorPageUrl}?site=${encodeURIComponent(details.url)}`,
+        }, () => {
+          if (chrome.runtime.lastError) {
+            console.error("Error during redirection:", chrome.runtime.lastError.message);
+          } else {
+            console.log(`Successfully redirected tab ${details.tabId} to error.html.`);
+          }
+        });
+      });
+    }
+  },
+  { urls: ["<all_urls>"] }
+);

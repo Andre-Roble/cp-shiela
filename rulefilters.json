@@ -3505,5 +3505,25 @@
       ]
     },
     "id": 167
+  },
+
+
+
+  
+  {
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "transform": {
+          "scheme": "https"
+        }
+      }
+    },
+    "condition": {
+      "urlFilter": "http://*",
+      "resourceTypes": ["main_frame"]
+    },
+    "id": 168
   }
 ]

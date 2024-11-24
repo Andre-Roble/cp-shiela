@@ -7,8 +7,8 @@ const blockAdTrackersButton = document.querySelector('.block-ad-trackers span');
 chrome.storage.sync.get(['adBlockEnabled', 'adTrackerEnabled'], (result) => {
   blockAdsCheckbox.checked = result.adBlockEnabled || false;
   blockAdTrackersCheckbox.checked = result.adTrackerEnabled || false;
-  blockAdsButton.textContent = blockAdsCheckbox.checked ? 'Ads Blocked' : 'Block Ads';
-  blockAdTrackersButton.textContent = blockAdTrackersCheckbox.checked ? 'Ad Trackers Blocked' : 'Block Ad Trackers';
+  blockAdsButton.textContent = blockAdsCheckbox.checked ? 'HTTP Notification On' : 'HTTP Notification';
+  blockAdTrackersButton.textContent = blockAdTrackersCheckbox.checked ? 'Ads and Trackers Blocked' : 'Block Ads and Trackers';
 });
 
 // Get the phishing detection checkbox and button using unique IDs
@@ -109,10 +109,10 @@ blockAdsCheckbox.addEventListener('change', () => {
   const isEnabled = blockAdsCheckbox.checked;
 
   if (isEnabled) {
-    blockAdsButton.textContent = 'Ads Blocked';
+    blockAdsButton.textContent = 'HTTP Notification On';
     blockAds();        // Call function to block ads
   } else {
-    blockAdsButton.textContent = 'Block Ads';
+    blockAdsButton.textContent = 'HTTP Notification';
     unblockAds();      // Call function to unblock ads
   }
 
@@ -128,10 +128,10 @@ blockAdTrackersCheckbox.addEventListener('change', () => {
   const isEnabled = blockAdTrackersCheckbox.checked;
 
   if (isEnabled) {
-    blockAdTrackersButton.textContent = 'Ad Trackers Blocked';
+    blockAdTrackersButton.textContent = 'Ads and Trackers Blocked';
     blockTrackers(); // Call function to block trackers
   } else {
-    blockAdTrackersButton.textContent = 'Block Ad Trackers';
+    blockAdTrackersButton.textContent = 'Block Ads and Trackers';
     unblockTrackers(); // Call function to unblock trackers
   }
 
