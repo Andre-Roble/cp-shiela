@@ -3,15 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style-error.css">
   <title>SSL Error</title>
 </head>
 <body>
-  <h1>Connection Not Secure</h1>
+  <div class="title-container">
+    <img src="src/bs-img.png" alt="Warning Icon" class="warning-icon">
+    <h1>Connection Not Secure</h1>
+    
+  
   <p>The SSL certificate for this site is invalid. Proceeding may put your information at risk.</p>
   <div>
     <button id="back-button">Return to Safety</button>
     <button id="cont-button">Continue to Site</button>
   </div>
+</div>
   <script src="error.js"></script>
 </body>
 </html>
