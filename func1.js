@@ -201,7 +201,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
 async function fetchData() {
   const textInput = document.getElementById('textInput').value.trim();
   if (!textInput) {
-    alert('Please enter a valid domain');
+    alert('Domain field cannot be empty. Please enter a valid domain (e.g. example.com, etc.)');
     return;
   }
 
