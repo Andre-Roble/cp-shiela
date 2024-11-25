@@ -7,7 +7,7 @@ const blockAdTrackersButton = document.querySelector('.block-ad-trackers span');
 chrome.storage.sync.get(['adBlockEnabled', 'adTrackerEnabled'], (result) => {
   blockAdsCheckbox.checked = result.adBlockEnabled || false;
   blockAdTrackersCheckbox.checked = result.adTrackerEnabled || false;
-  blockAdsButton.textContent = blockAdsCheckbox.checked ? 'HTTP Notification On' : 'HTTP Notification';
+  blockAdsButton.textContent = blockAdsCheckbox.checked ? 'HTTP Detector On' : 'HTTP Detector';
   blockAdTrackersButton.textContent = blockAdTrackersCheckbox.checked ? 'Ads and Trackers Blocked' : 'Block Ads and Trackers';
 });
 
@@ -109,10 +109,10 @@ blockAdsCheckbox.addEventListener('change', () => {
   const isEnabled = blockAdsCheckbox.checked;
 
   if (isEnabled) {
-    blockAdsButton.textContent = 'HTTP Notification On';
+    blockAdsButton.textContent = 'HTTP Detector On';
     blockAds();        // Call function to block ads
   } else {
-    blockAdsButton.textContent = 'HTTP Notification';
+    blockAdsButton.textContent = 'HTTP Detector';
     unblockAds();      // Call function to unblock ads
   }
 
