@@ -281,22 +281,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 //----------HTTPS ENFORCEMENT-----------------------------------------------------------------------------------------------------------------------------------------------
 function notification(url) {
-  chrome.storage.sync.get('adTrackerEnabled', function(result) {
-    if (result.adTrackerEnabled) {
-      if (url.includes('/search') || url.includes('?q=')) {
-        return;
-      }
+  if (url.includes('/search') || url.includes('?q=')) {
+    return;
+  }
 
-      if (url.startsWith('http://')) {
-        chrome.notifications.create({
-          title: 'SHIELA',
-          message: `You are visiting an unsecure site: ${url}`,
-          iconUrl: 'src/bs-img.png',
-          type: 'basic'
-        });
-      }
-    }
-  });
+  if (url.startsWith('http://')) {
+    chrome.notifications.create({
+      title: 'SHIELA',
+      message: `You are visiting an unsecure site: ${url}`,
+      iconUrl: 'src/bs-img.png',
+      type: 'basic'
+    });
+  }
 }
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
