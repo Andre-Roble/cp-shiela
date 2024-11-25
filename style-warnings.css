@@ -89,33 +89,50 @@
   border: #ffffff solid 1px;
 }
 
+/* For screens smaller than 900px */
+@media only screen and (max-width: 900px) {
+  .warning-content {
+    min-width: 90%;
+    max-width: 90%;
+    padding: 10px;
+  }
+  .button-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .back-button, .details-button {
+    width: 50%;
+    margin: 10px auto;
+  }
+}
+
 /* For screens smaller than 768px */
 @media only screen and (max-width: 768px) {
   .warning-content {
-      min-width: 90%;
-      max-width: 90%;
-      padding: 10px;
+    min-width: 90%;
+    max-width: 90%;
+    padding: 10px;
   }
   .button-container {
-      flex-direction: column;
-      gap: 10px;
+    flex-direction: column;
+    gap: 10px;
   }
   .back-button, .details-button {
-      width: 50%;
-      margin: 10px auto;
+    width: 50%;
+    margin: 10px auto;
   }
 }
 
 /* For screens smaller than 480px */
 @media only screen and (max-width: 480px) {
   .warning-title {
-      font-size: 2rem;
+    font-size: 2rem;
   }
   .warning-content p {
-      font-size: 1em;
+    font-size: 1em;
   }
   .button-container {
-      margin-top: 10px;
+    margin-top: 10px;
   }
 }
 
@@ -145,4 +162,10 @@
 #details-table th {
   background-color: #ffffff;
   font-weight: bold;
+}
+.w-shiela-icon {
+  width: 70px;
+  height: 70px;
+  vertical-align: middle;
+  margin-top: -20px;
 }
