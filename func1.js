@@ -237,12 +237,12 @@ function displayResults(data) {
   ];
   
   const keysToDisplay1 = [
-    'isExpired', // critical: is the certificate expired?
-    'isvalidCertificate', // critical: is the certificate valid?
-    'daysLeft', // important: how many days are left until expiration?
-    'lifespanInDays', // important: what is the certificate's lifespan?
-    'isWildCard', // informative: is the certificate a wildcard certificate?
-    'canBeSelfSigned', // informative: can the certificate be self-signed?
+    'isExpired', // is the certificate expired?
+    'isvalidCertificate', // is the certificate valid?
+    'daysLeft', // how many days are left until expiration?
+    'lifespanInDays', // what is the certificate's lifespan?
+    'isWildCard', // is the certificate a wildcard certificate?
+    'canBeSelfSigned', //  can the certificate be self-signed?
     'certDetails', // detailed information about the certificate
     'name', // certificate name
     'CN', // common name
