@@ -14,7 +14,8 @@
     "windows",
     "notifications",
     "webRequest",
-    "webNavigation"
+    "webNavigation",
+    "alarms"
   ],
   "host_permissions": [
     "*://*/*",

@@ -1,28 +1,32 @@
+// Select necessary DOM elements
 const blockAdsCheckbox = document.getElementById('ad-block-toggle');
 const blockAdTrackersCheckbox = document.getElementById('ad-tracker-toggle');
 const blockAdsButton = document.querySelector('.block-ads span');
 const blockAdTrackersButton = document.querySelector('.block-ad-trackers span');
-
-// Initialize settings from Chrome storage
-chrome.storage.sync.get(['adBlockEnabled', 'adTrackerEnabled'], (result) => {
-  blockAdsCheckbox.checked = result.adBlockEnabled || false;
-  blockAdTrackersCheckbox.checked = result.adTrackerEnabled || false;
-  blockAdsButton.textContent = blockAdsCheckbox.checked ? 'HTTP Detector On' : 'HTTP Detector';
-  blockAdTrackersButton.textContent = blockAdTrackersCheckbox.checked ? 'Ads and Trackers Blocked' : 'Block Ads and Trackers';
-});
-
-// Get the phishing detection checkbox and button using unique IDs
 const phishDetectionCheckbox = document.getElementById('phish-toggle');
 const phishDetectionButton = document.querySelector('.phish span');
 
-// Variable to prevent multiple concurrent phishing checks
-let isPhishCheckInProgress = false;
+// Initialize phishing detection toggle state
+let isPhishDetectionEnabled = false;
 
-// Retrieve the toggle state from Chrome's storage on load for phishing detection
-chrome.storage.sync.get('phishingDetectionEnabled', (data) => {
-  const isEnabled = data.phishingDetectionEnabled || false;
-  phishDetectionCheckbox.checked = isEnabled;
-});
+// Initialize settings from Chrome storage for all features
+chrome.storage.sync.get(
+  ['adBlockEnabled', 'adTrackerEnabled', 'phishingDetectionEnabled'],
+  (result) => {
+    // Set ad and tracker block states
+    blockAdsCheckbox.checked = result.adBlockEnabled || false;
+    blockAdTrackersCheckbox.checked = result.adTrackerEnabled || false;
+    blockAdsButton.textContent = blockAdsCheckbox.checked ? 'HTTP Detector On' : 'HTTP Detector';
+    blockAdTrackersButton.textContent = blockAdTrackersCheckbox.checked ? 'Ads and Trackers Blocked' : 'Block Ads and Trackers';
+
+    // Set phishing detection state
+    isPhishDetectionEnabled = result.phishingDetectionEnabled || false;
+    phishDetectionCheckbox.checked = isPhishDetectionEnabled;
+    phishDetectionButton.textContent = isPhishDetectionEnabled
+      ? 'Phishing Detection: On'
+      : 'Phishing Detection: Off';
+  }
+);
 
 // Debounce function to prevent rapid toggling
 function debounce(func, delay) {
@@ -33,87 +37,89 @@ function debounce(func, delay) {
   };
 }
 
-// Event listener for Phishing Detection toggle with debounced handler
-phishDetectionCheckbox.addEventListener('change', debounce(async () => {
-  const isEnabled = phishDetectionCheckbox.checked;
-
-  // Save the toggle state in Chrome's storage
-  chrome.storage.sync.set({ phishingDetectionEnabled: isEnabled });
-
-  if (isEnabled) {
-    enablePhishDetection();
-  } else {
-    disablePhishDetection();
-  }
-}, 300));  // Adjust debounce delay as needed
-
-// Function to enable phishing detection
+// Define phishing detection functions
 function enablePhishDetection() {
-  if (isPhishCheckInProgress) return;  // Prevent concurrent phishing checks
+  console.log('Phishing detection enabled.');
+  // Logic for enabling phishing detection (e.g., initialize listeners or background checks)
+}
 
-  isPhishCheckInProgress = true;
+
+function disablePhishDetection() {
+  console.log('Phishing detection disabled.');
+  // Logic for disabling phishing detection (e.g., remove listeners or stop checks)
+}
+
+// Event listener for phishing detection toggle
+phishDetectionCheckbox.addEventListener(
+  'change',
+  debounce(() => {
+    isPhishDetectionEnabled = phishDetectionCheckbox.checked;
+
+    // Save the state to Chrome storage
+    chrome.storage.sync.set({ phishingDetectionEnabled: isPhishDetectionEnabled });
+
+    // Update the button text
+    phishDetectionButton.textContent = isPhishDetectionEnabled
+      ? 'Phishing Detection: On'
+      : 'Phishing Detection: Off';
+
+      if (isPhishDetectionEnabled) {
+        enablePhishDetection();
+      } else {
+        disablePhishDetection();
+      }
+  }, 300)
+);
+
+function checkPhishingOnActiveTab() {
+  if (!isPhishDetectionEnabled) return; // Skip detection if disabled
+
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (!tabs || !tabs[0]) {
-      console.error("No active tab found.");
-      isPhishCheckInProgress = false;
+      console.error('No active tab found.');
       return;
     }
 
     const url = tabs[0].url;
-    console.log("Checking URL for threats:", url);
+    console.log('Checking URL for threats:', url);
 
-    // Send a message to background.js to check if the site is a threat
-    chrome.runtime.sendMessage({ action: 'checkURLWithVirusTotal', url: url }, (response) => {
-      console.log("Threat check response:", response);
+    // Send a message to the background script to check the URL
+    chrome.runtime.sendMessage(
+      { action: 'checkURLWithVirusTotal', url },
+      (response) => {
+        if (chrome.runtime.lastError) {
+          console.error('Error in response:', chrome.runtime.lastError);
+          return;
+        }
 
-      // Handle VirusTotal response
-      if (response && response.isThreat) {
-        const threatLevel = response.threatLevel || 'Unknown';
-        const warningUrl = chrome.runtime.getURL(`warning.html?threatLevel=${threatLevel}&url=${encodeURIComponent(url)}`);
-        console.log("Redirecting to warning page:", warningUrl);
-        chrome.tabs.update(tabs[0].id, { url: warningUrl });
-      } else {
-        console.log("No threat detected, no warning page displayed.");
+        if (response && response.isThreat) {
+          const threatLevel = response.threatLevel || 'Unknown';
+          console.log(`Threat detected: ${threatLevel}`);
+        } else {
+          console.log('No threat detected.');
+        }
       }
-
-      // Reset flag after check is complete
-      isPhishCheckInProgress = false;
-    });
+    );
   });
 }
 
-
-// Function to disable phishing detection
-function disablePhishDetection() {
-  console.log('Phishing detection disabled.');
-}
-
-//handle response
-document.getElementById("phish-toggle").addEventListener("change", (event) => {
-  const enabled = event.target.checked;
-  chrome.runtime.sendMessage({ action: "checkPhishing", url: window.location.href }, (response) => {
-    if (response && response.isPhishing) {
-      console.log("Phishing detected:", response);
-      // Handle phishing detection logic here
-    } else {
-      console.log("No phishing detected.");
-    }
-  });
+// Periodically check phishing detection on active tab
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === 'complete') {
+    checkPhishingOnActiveTab();
+  }
 });
 
-
-
-
-// Event listener for blocking/unblocking ads
+// Event listener for HTTP Detector toggle
 blockAdsCheckbox.addEventListener('change', () => {
   const isEnabled = blockAdsCheckbox.checked;
 
   if (isEnabled) {
     blockAdsButton.textContent = 'HTTP Detector On';
-    blockAds();        // Call function to block ads
+    blockAds();        // Call function on HTTP warning page
   } else {
     blockAdsButton.textContent = 'HTTP Detector';
-    unblockAds();      // Call function to unblock ads
+    unblockAds();      // Call function to off/notification warning
   }
 
   // Send message to background script to enable/disable ad blocking
@@ -201,7 +207,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
 async function fetchData() {
   const textInput = document.getElementById('textInput').value.trim();
   if (!textInput) {
-    alert('Domain field cannot be empty. Please enter a valid domain (e.g. example.com, etc.)');
+    alert('Please enter a valid domain');
     return;
   }
 
@@ -237,12 +243,12 @@ function displayResults(data) {
   ];
   
   const keysToDisplay1 = [
-    'isExpired', // is the certificate expired?
-    'isvalidCertificate', // is the certificate valid?
-    'daysLeft', // how many days are left until expiration?
-    'lifespanInDays', // what is the certificate's lifespan?
-    'isWildCard', // is the certificate a wildcard certificate?
-    'canBeSelfSigned', //  can the certificate be self-signed?
+    'isExpired', // critical: is the certificate expired?
+    'isvalidCertificate', // critical: is the certificate valid?
+    'daysLeft', // important: how many days are left until expiration?
+    'lifespanInDays', // important: what is the certificate's lifespan?
+    'isWildCard', // informative: is the certificate a wildcard certificate?
+    'canBeSelfSigned', // informative: can the certificate be self-signed?
     'certDetails', // detailed information about the certificate
     'name', // certificate name
     'CN', // common name

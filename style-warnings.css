@@ -127,6 +127,7 @@
   background-color: #f8f9fa;
   border: 1px solid #ccc;
   border-radius: 5px;
+  color: rgb(0, 0, 0);
 }
 
 #details-table {
@@ -142,6 +143,6 @@
 }
 
 #details-table th {
-  background-color: #f1f1f1;
+  background-color: #ffffff;
   font-weight: bold;
 }
