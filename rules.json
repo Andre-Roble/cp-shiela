@@ -8,10 +8,10 @@
   "amazonaax.com",
   "amazonclix.com",
   
-  "pagead2.googlesyndication.com",
-  "adservice.google.com",
-  "pagead2.googleadservices.com",
-  "afs.googlesyndication.com",
+  { "url": "pagead2.googlesyndication.com", "priority": 3 },
+  { "url": "adservice.google.com", "priority": 3 },
+  { "url": "pagead2.googleadservices.com", "priority": 3 },
+  { "url": "afs.googlesyndication.com", "priority": 3 },
   
   "stats.g.doubleclick.net",
   "ad.doubleclick.net",
@@ -29,10 +29,10 @@
   "media.net",
   "adservetx.media.net",
   
-  "analytics.google.com",
-  "click.googleanalytics.com",
-  "google-analytics.com",
-  "ssl.google-analytics.com",
+  { "url": "analytics.google.com", "priority": 3 },
+  { "url": "click.googleanalytics.com", "priority": 3 },
+  { "url": "google-analytics.com", "priority": 3 },
+  { "url": "ssl.google-analytics.com", "priority": 3 },
   
   "adm.hotjar.com",
   "identify.hotjar.com",
@@ -196,5 +196,8 @@
   
   "ads.facebook.com",
   "ads-dev.pinterest.com",
-  "widgets.pinterest.com"
+  "widgets.pinterest.com",
+
+  "://.googlevideo.com/videoplayback?*&adformat=*",
+  "://.youtube.com/*"
 ]

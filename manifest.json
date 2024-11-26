@@ -40,6 +40,16 @@
         "id": "ruleset_1",
         "enabled": true,
         "path": "rulefilters.json"
+      },
+      {
+        "id": "ruleset_2",
+        "enabled": true,
+        "path": "rulehttp.json"
+      },
+      {
+        "id": "ruleset_3",
+        "enabled": true,
+        "path": "rulehttpallow.json"
       }
     ]
   },

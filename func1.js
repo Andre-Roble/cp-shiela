@@ -110,16 +110,18 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   }
 });
 
-// Event listener for HTTP Detector toggle
+
+
+// Event listener for HTTP Detector toggle 
 blockAdsCheckbox.addEventListener('change', () => {
   const isEnabled = blockAdsCheckbox.checked;
 
   if (isEnabled) {
     blockAdsButton.textContent = 'HTTP Detector On';
-    blockAds();        // Call function on HTTP warning page
+    blockAds(); // Call function to block ads
   } else {
     blockAdsButton.textContent = 'HTTP Detector';
-    unblockAds();      // Call function to off/notification warning
+    unblockAds(); // Call function to unblock ads
   }
 
   // Send message to background script to enable/disable ad blocking
@@ -141,20 +143,22 @@ blockAdTrackersCheckbox.addEventListener('change', () => {
     unblockTrackers(); // Call function to unblock trackers
   }
 
-    // Send message to background script to enable/disable ad blocking
-    chrome.runtime.sendMessage({ action: 'toggleAdTrackers', enabled: isEnabled });
+  // Send message to background script to enable/disable tracker blocking
+  chrome.runtime.sendMessage({ action: 'toggleAdTrackers', enabled: isEnabled });
 
-    // Save the state
-    chrome.storage.sync.set({ adTrackerEnabled: isEnabled });
+  // Save the state
+  chrome.storage.sync.set({ adTrackerEnabled: isEnabled });
 });
 
 
-const RULESET_ID = 'ruleset_1';
+
+
+
 
 // Function to block ads and trackers by enabling the ruleset
 function blockAds() {
   chrome.declarativeNetRequest.updateEnabledRulesets(
-    { enableRulesetIds: [RULESET_ID] },
+    { enableRulesetIds: ["ruleset_2"] },
     () => {
       console.log("Ads and trackers have been blocked.");
     }
@@ -164,7 +168,7 @@ function blockAds() {
 // Function to unblock ads and trackers by disabling the ruleset
 function unblockAds() {
   chrome.declarativeNetRequest.updateEnabledRulesets(
-    { disableRulesetIds: [RULESET_ID] },
+    { disableRulesetIds: ["ruleset_2"] },
     () => {
       console.log("Ads and trackers have been unblocked.");
     }

@@ -34,19 +34,35 @@ function updateBlockingRules(adEnabled, trackerEnabled) {
   }
 }
 
-// Function to enable ad blocking
+// Function to enable http detection
 function enableAdBlocking() {
   chrome.declarativeNetRequest.updateEnabledRulesets(
-    { enableRulesetIds: ["ruleset_1"] }, 
-    () => console.log("Ad blocking enabled.")
+    { enableRulesetIds: ["ruleset_2"] }, 
+    () => console.log("http on")
   );
 }
 
-// Function to disable ad blocking
+// Function to disable http detection
 function disableAdBlocking() {
   chrome.declarativeNetRequest.updateEnabledRulesets(
-    { disableRulesetIds: ["ruleset_1"] }, 
-    () => console.log("Ad blocking disabled.")
+    { disableRulesetIds: ["ruleset_2"] }, 
+    () => console.log("http off")
+  );
+}
+
+// Function to enable allowing HTTP without redirect
+function enableAllowHTTP() {
+  chrome.declarativeNetRequest.updateEnabledRulesets(
+    { enableRulesetIds: ["ruleset_3"] }, 
+    () => console.log("Allow HTTP on")
+  );
+}
+
+// Function to disable allowing HTTP without redirect
+function disableAllowHTTP() {
+  chrome.declarativeNetRequest.updateEnabledRulesets(
+    { disableRulesetIds: ["ruleset_3"] }, 
+    () => console.log("Allow HTTP off")
   );
 }
 
@@ -54,7 +70,7 @@ function disableAdBlocking() {
 function enableTrackerBlocking() {
   chrome.declarativeNetRequest.updateEnabledRulesets(
     { enableRulesetIds: ["ruleset_1"] }, 
-    () => console.log("Ad tracker blocking enabled.")
+    () => console.log("Ads & tracker blocking on")
   );
 }
 
@@ -62,7 +78,7 @@ function enableTrackerBlocking() {
 function disableTrackerBlocking() {
   chrome.declarativeNetRequest.updateEnabledRulesets(
     { disableRulesetIds: ["ruleset_1"] }, 
-    () => console.log("Ad tracker blocking disabled.")
+    () => console.log("Ads & tracker blocking off")
   );
 }
 
@@ -79,38 +95,30 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'toggleAdBlock') {
     const adEnabled = request.enabled;
     console.log("Ad block toggle:", adEnabled);
-    
-    // Enable or disable tracker blocking based on the ad block toggle
+
     if (adEnabled) {
-      enableTrackerBlocking();  // **Automatically enable tracker blocking**
-      chrome.storage.sync.set({ trackerBlockEnabled: true });
+      enableAdBlocking();
     } else {
-      disableTrackerBlocking(); // **Automatically disable tracker blocking**
-      chrome.storage.sync.set({ trackerBlockEnabled: false });
+      disableAdBlocking();
     }
-    
-    updateBlockingRules(adEnabled, adEnabled); // **Sync states**
+
     chrome.storage.sync.set({ adBlockEnabled: adEnabled });
-    
+
     sendResponse({ status: 'success' });
   }
 
   if (request.action === 'toggleAdTrackers') {
     const trackerEnabled = request.enabled;
     console.log("Tracker block toggle:", trackerEnabled);
-    
-    // Enable or disable ad blocking based on the tracker block toggle
+
     if (trackerEnabled) {
-      enableAdBlocking();  // **Automatically enable ad blocking**
-      chrome.storage.sync.set({ adBlockEnabled: true });
+      enableTrackerBlocking();
     } else {
-      disableAdBlocking(); // **Automatically disable ad blocking**
-      chrome.storage.sync.set({ adBlockEnabled: false });
+      disableTrackerBlocking();
     }
-    
-    updateBlockingRules(trackerEnabled, trackerEnabled); // **Sync states**
+
     chrome.storage.sync.set({ trackerBlockEnabled: trackerEnabled });
-    
+
     sendResponse({ status: 'success' });
   }
 
@@ -128,26 +136,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
-// Listen for action button click to toggle ad blocking and tracker blocking
-chrome.action.onClicked.addListener(() => {
-  chrome.storage.sync.get(['adBlockEnabled', 'trackerBlockEnabled'], (result) => {
-    const adEnabled = result.adBlockEnabled;
-    const trackerEnabled = result.trackerBlockEnabled;
 
-    // Toggle ad blocking and tracker blocking
-    if (adEnabled) {
-      disableAdBlocking();
-      disableTrackerBlocking(); // **Disable tracker blocking as well**
-      chrome.storage.sync.set({ adBlockEnabled: false, trackerBlockEnabled: false }); // **Sync both states**
-      console.log("Ad blocking and tracker blocking disabled.");
-    } else {
-      enableAdBlocking();
-      enableTrackerBlocking(); // **Enable tracker blocking as well**
-      chrome.storage.sync.set({ adBlockEnabled: true, trackerBlockEnabled: true }); // **Sync both states**
-      console.log("Ad blocking and tracker blocking enabled.");
-    }
-  });
-});
+
+
 
 //----------PHISHING DETECTION-----------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -492,11 +483,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 
 //----------HTTPS ENFORCEMENT-----------------------------------------------------------------------------------------------------------------------------------------------
+
+// Notification function will only be triggered on HTTP sites when SSL errors are detected
 function notification(url) {
   if (url.includes('/search') || url.includes('?q=')) {
     return;
   }
 
+  // Only notify if the site starts with "http://" and there's no SSL error flag
   if (url.startsWith('http://')) {
     chrome.notifications.create({
       title: 'SHIELA',
@@ -513,8 +507,6 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
   }
 });
 
-
-
 // Listen for SSL-related errors on web requests
 chrome.webRequest.onErrorOccurred.addListener(
   (details) => {
@@ -527,6 +519,12 @@ chrome.webRequest.onErrorOccurred.addListener(
     // Check if the error is SSL-related
     if (sslErrors.includes(details.error)) {
       console.log(`SSL Error detected on: ${details.url}`);
+
+      // Disable the automatic HTTP-to-HTTPS redirection when SSL errors occur
+      disableAdBlocking();
+
+      // Enable the new ruleset that allows HTTP without redirection
+      enableAllowHTTP();
 
       // Ensure we're not redirecting the error page itself
       const errorPageUrl = chrome.runtime.getURL("error.html");
@@ -544,7 +542,7 @@ chrome.webRequest.onErrorOccurred.addListener(
       // Redirect to the error page with the original site URL as a parameter
       chrome.tabs.get(details.tabId, (tab) => {
         if (chrome.runtime.lastError) {
-          console.error("Error fetching tab:", chrome.runtime.lastError.message);
+          console.error(`Error fetching tab: ${chrome.runtime.lastError.message}`);
           return;
         }
 
@@ -568,3 +566,9 @@ chrome.webRequest.onErrorOccurred.addListener(
   },
   { urls: ["<all_urls>"] }
 );
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "enableAllowHTTP") {
+    enableAllowHTTP();
+  }
+});

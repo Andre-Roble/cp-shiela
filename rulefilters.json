@@ -168,7 +168,7 @@
     "id": 8
   },
   {
-    "priority": 1,
+    "priority": 3,
     "action": {
       "type": "block"
     },
@@ -189,7 +189,7 @@
     "id": 9
   },
   {
-    "priority": 1,
+    "priority": 3,
     "action": {
       "type": "block"
     },
@@ -210,7 +210,7 @@
     "id": 10
   },
   {
-    "priority": 1,
+    "priority": 3,
     "action": {
       "type": "block"
     },
@@ -231,7 +231,7 @@
     "id": 11
   },
   {
-    "priority": 1,
+    "priority": 3,
     "action": {
       "type": "block"
     },
@@ -525,7 +525,7 @@
     "id": 25
   },
   {
-    "priority": 1,
+    "priority": 3,
     "action": {
       "type": "block"
     },
@@ -546,7 +546,7 @@
     "id": 26
   },
   {
-    "priority": 1,
+    "priority": 3,
     "action": {
       "type": "block"
     },
@@ -567,7 +567,7 @@
     "id": 27
   },
   {
-    "priority": 1,
+    "priority": 3,
     "action": {
       "type": "block"
     },
@@ -588,7 +588,7 @@
     "id": 28
   },
   {
-    "priority": 1,
+    "priority": 3,
     "action": {
       "type": "block"
     },
@@ -3506,24 +3506,46 @@
     },
     "id": 167
   },
-
-
-
-  
   {
     "priority": 1,
     "action": {
-      "type": "redirect",
-      "redirect": {
-        "transform": {
-          "scheme": "https"
-        }
-      }
+      "type": "block"
     },
     "condition": {
-      "urlFilter": "http://*",
-      "resourceTypes": ["main_frame"]
+      "urlFilter": "://.googlevideo.com/videoplayback?*&adformat=*",
+      "resourceTypes": [
+        "main_frame",
+        "sub_frame",
+        "stylesheet",
+        "script",
+        "image",
+        "xmlhttprequest",
+        "media",
+        "font",
+        "ping"
+      ]
     },
     "id": 168
+  },
+  {
+    "priority": 1,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "://.youtube.com/*",
+      "resourceTypes": [
+        "main_frame",
+        "sub_frame",
+        "stylesheet",
+        "script",
+        "image",
+        "xmlhttprequest",
+        "media",
+        "font",
+        "ping"
+      ]
+    },
+    "id": 169
   }
 ]
