@@ -14,7 +14,12 @@
   overflow-x: hidden;
   overflow-y: hidden;
 }
-
+.w-shiela-icon {
+  width: 70px;
+  height: 70px;
+  vertical-align: middle;
+  margin-top: -20px;
+}
 .warning-header {
   background-color: #dc3545;
   text-align: center;
@@ -139,33 +144,33 @@
 /* Details Section */
 #details-container {
   display: none;
-  margin-top: 20px;
-  padding: 10px;
-  background-color: #f8f9fa;
-  border: 1px solid #ccc;
+  margin: 20px auto;
   border-radius: 5px;
-  color: rgb(0, 0, 0);
+  color: #ffffff; /* simplified color value */
+  width: 90%;
+
+  background-color: #dc3545;
+  padding: 20px;
+  box-shadow: 1px 1px 15px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px); 
 }
 
 #details-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
+  table-layout: fixed; /* added to prevent table from stretching */
 }
 
 #details-table th, #details-table td {
-  border: 1px solid #ddd;
+  border: 1px solid  rgba(255, 255, 255, 0.472);
   padding: 8px;
   text-align: left;
+  vertical-align: top; /* added to align cell content */
 }
 
 #details-table th {
-  background-color: #ffffff;
+  background-color: #dc3545;
   font-weight: bold;
-}
-.w-shiela-icon {
-  width: 70px;
-  height: 70px;
-  vertical-align: middle;
-  margin-top: -20px;
+  color: #ffffff; /* added darker text color for better contrast */
 }
