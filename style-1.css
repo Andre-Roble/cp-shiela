@@ -10,8 +10,8 @@
 }
 body {
   margin: 0;
-  height: 260px; /* Adjust height */
-  width: 250px; /* Adjust width  */
+  height: 260px; 
+  width: 250px; 
   font-family: 'Times New Roman', Times, serif;
 
 
@@ -32,9 +32,9 @@ body {
 }
 
 .title-image {
-  width: 30px; /* adjust the width to your liking */
-  height: 30px; /* adjust the height to your liking */
-  margin-right: 1px; /* adjust the margin to your liking */
+  width: 30px; 
+  height: 30px; 
+  margin-right: 1px; 
 }
 
 .container {
@@ -201,6 +201,7 @@ span{
   height: 25px;
   padding: 5px;
   margin:auto;
+  cursor: pointer;
 }
 .check-btn:hover{
   background-color: rgb(114, 70, 203);

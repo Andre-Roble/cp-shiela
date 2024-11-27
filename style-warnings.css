@@ -9,7 +9,7 @@
 
 #warning-body {
   margin: 100px auto;
-  background-color: #dc3545; /* default red background */
+  background-color: #dc3545; 
   color: #fff;
   overflow-x: hidden;
   overflow-y: hidden;
@@ -23,7 +23,6 @@
 .warning-header {
   background-color: #dc3545;
   text-align: center;
-  /* box-shadow: 1px 1px 5px 5px rgba(0, 0, 0, 0.5); */
 }
 
 .warning-title {
@@ -40,7 +39,6 @@
   justify-content: center;
   color: #ffffff;
   background-color: transparent;
-  /* border: #ffffff solid 2px; */
   box-shadow: 1px 1px 15px rgba(0, 0, 0, 0.3);
   border-radius: 5px;
 }
@@ -85,7 +83,7 @@
   border-radius: 5px;
   padding: 10px 20px;
   cursor: pointer;
-  width: 150px; /* Add a fixed width to the buttons */
+  width: 150px; 
 }
 
 .back-button:hover, .details-button:hover {
@@ -146,7 +144,7 @@
   display: none;
   margin: 20px auto;
   border-radius: 5px;
-  color: #ffffff; /* simplified color value */
+  color: #ffffff; 
   width: 90%;
 
   background-color: #dc3545;
@@ -159,18 +157,18 @@
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
-  table-layout: fixed; /* added to prevent table from stretching */
+  table-layout: fixed; 
 }
 
 #details-table th, #details-table td {
   border: 1px solid  rgba(255, 255, 255, 0.472);
   padding: 8px;
   text-align: left;
-  vertical-align: top; /* added to align cell content */
+  vertical-align: top; 
 }
 
 #details-table th {
   background-color: #dc3545;
   font-weight: bold;
-  color: #ffffff; /* added darker text color for better contrast */
+  color: #ffffff; 
 }

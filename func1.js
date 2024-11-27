@@ -199,7 +199,38 @@ function unblockTrackers() {
 
 // Check SSL button functionality
 const checkButton = document.querySelector('.check-btn');
-checkButton.addEventListener('click', fetchData);
+const loadingIcon = document.createElement('i');
+loadingIcon.className = 'fas fa-spinner fa-spin';
+loadingIcon.style.fontSize = '16px';
+loadingIcon.style.marginLeft = '10px';
+
+checkButton.addEventListener('click', function() {
+  const textInput = document.getElementById('textInput').value.trim();
+  if (!textInput) {
+    alert('Domain field cannot be empty. Please enter a valid domain (e.g. example.com, etc.)');
+    return;
+  }
+
+  checkButton.disabled = true;
+  checkButton.innerHTML = 'Checking...';
+  checkButton.appendChild(loadingIcon);
+
+  fetchData(textInput).then(() => {
+    checkButton.disabled = false;
+    checkButton.innerHTML = 'Check';
+    if (checkButton.contains(loadingIcon)) {
+      checkButton.removeChild(loadingIcon);
+    }
+  });
+});
+
+document.getElementById('textInput').addEventListener('input', function() {
+  checkButton.disabled = false;
+  checkButton.innerHTML = 'Check';
+  if (checkButton.contains(loadingIcon)) {
+    checkButton.removeChild(loadingIcon);
+  }
+});
 
 chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
   var currentTab = tabs[0];
