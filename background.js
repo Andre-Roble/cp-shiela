@@ -526,14 +526,14 @@ chrome.webRequest.onErrorOccurred.addListener(
       // Enable the new ruleset that allows HTTP without redirection
       enableAllowHTTP();
 
-      // Ensure we're not redirecting the error page itself
+      // Ensure we're not redirecting to error.html if we're already there
       const errorPageUrl = chrome.runtime.getURL("error.html");
       if (details.url.startsWith(errorPageUrl)) {
         console.log("Already on the error page. Skipping redirection.");
-        return;
+        return; // Skip redirecting to error.html again
       }
 
-      // Skip redirect if the URL contains skipError=true
+      // Skip redirect if the URL contains skipError=true (user has bypassed the error)
       if (details.url.includes("skipError=true")) {
         console.log("Skipping redirection for:", details.url);
         return;
@@ -572,3 +572,4 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     enableAllowHTTP();
   }
 });
+// working continue to site button

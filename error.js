@@ -10,27 +10,37 @@ if (!originalSite || !/^https?:\/\//.test(originalSite)) {
 } else {
   console.log("Ready to redirect to:", originalSite);
 
+  // Handle the "Continue to Site" button
   const continueButton = document.getElementById("cont-button");
   continueButton.addEventListener("click", async () => {
     console.log("Attempting to redirect to:", originalSite);
-  
+
     try {
-      // Enable the new ruleset that allows HTTP without redirect
+      // Clear ruleset_2 and set ruleset_3
+      sessionStorage.removeItem('ruleset_2');
+      localStorage.removeItem('ruleset_2');
+      
+      // Set ruleset_3 (activate it)
+      sessionStorage.setItem('ruleset_3', 'active');
+      localStorage.setItem('ruleset_3', 'active');
+      
+      // Enable the new ruleset that allows HTTP without redirection
       chrome.runtime.sendMessage({ action: "enableAllowHTTP" });
-  
-      // Proceed to the original site
-      const safeUrl = originalSite;
-  
+
+      // Modify the URL to allow HTTP and strip 'https://'
+      const safeUrl = originalSite.replace(/^https:\/\//, 'http://');
+      console.log("Redirecting to:", safeUrl);
+
       // Find the current active tab
       const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
       if (tabs.length === 0) {
         console.error("No active tabs found. Cannot redirect.");
         return;
       }
-  
+
       const currentTab = tabs[0];
       console.log("Redirecting tab ID:", currentTab.id, "to URL:", safeUrl);
-  
+
       // Redirect the current tab to the safe URL
       chrome.tabs.update(currentTab.id, { url: safeUrl }, () => {
         if (chrome.runtime.lastError) {
@@ -43,10 +53,8 @@ if (!originalSite || !/^https?:\/\//.test(originalSite)) {
       console.error("Error during redirection attempt:", error.message);
     }
   });
-  
 
-
-  // Add event listener for the "Return to Safety" button
+  // Handle the "Return to Safety" button
   const goBackButton = document.getElementById("back-button");
   goBackButton.addEventListener("click", async () => {
     try {
@@ -73,3 +81,4 @@ if (!originalSite || !/^https?:\/\//.test(originalSite)) {
     }
   });
 }
+// working continue to site button
