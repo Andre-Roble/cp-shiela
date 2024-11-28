@@ -520,53 +520,66 @@ chrome.webRequest.onErrorOccurred.addListener(
     if (sslErrors.includes(details.error)) {
       console.log(`SSL Error detected on: ${details.url}`);
 
-      // Disable the automatic HTTP-to-HTTPS redirection when SSL errors occur
-      disableAdBlocking();
+      // Get the ad-blocking state from storage
+      chrome.storage.sync.get('adBlockEnabled', (data) => {
+        const isAdBlockEnabled = data.adBlockEnabled;
 
-      // Enable the new ruleset that allows HTTP without redirection
-      enableAllowHTTP();
+        if (isAdBlockEnabled) {
+          // If ad-blocking is enabled, process the SSL error
+          console.log("Ad-blocking is enabled, handling SSL error.");
 
-      // Ensure we're not redirecting to error.html if we're already there
-      const errorPageUrl = chrome.runtime.getURL("error.html");
-      if (details.url.startsWith(errorPageUrl)) {
-        console.log("Already on the error page. Skipping redirection.");
-        return; // Skip redirecting to error.html again
-      }
+          // Disable the automatic HTTP-to-HTTPS redirection when SSL errors occur
+          disableAdBlocking();
 
-      // Skip redirect if the URL contains skipError=true (user has bypassed the error)
-      if (details.url.includes("skipError=true")) {
-        console.log("Skipping redirection for:", details.url);
-        return;
-      }
+          // Enable the new ruleset that allows HTTP without redirection
+          enableAllowHTTP();
 
-      // Redirect to the error page with the original site URL as a parameter
-      chrome.tabs.get(details.tabId, (tab) => {
-        if (chrome.runtime.lastError) {
-          console.error(`Error fetching tab: ${chrome.runtime.lastError.message}`);
-          return;
-        }
-
-        if (!tab) {
-          console.error(`Tab not found for ID: ${details.tabId}`);
-          return;
-        }
-
-        console.log(`Redirecting tab ${details.tabId} to error.html.`);
-        chrome.tabs.update(details.tabId, {
-          url: `${errorPageUrl}?site=${encodeURIComponent(details.url)}`,
-        }, () => {
-          if (chrome.runtime.lastError) {
-            console.error("Error during redirection:", chrome.runtime.lastError.message);
-          } else {
-            console.log(`Successfully redirected tab ${details.tabId} to error.html.`);
+          // Ensure we're not redirecting to error.html if we're already there
+          const errorPageUrl = chrome.runtime.getURL("error.html");
+          if (details.url.startsWith(errorPageUrl)) {
+            console.log("Already on the error page. Skipping redirection.");
+            return; // Skip redirecting to error.html again
           }
-        });
+
+          // Skip redirect if the URL contains skipError=true (user has bypassed the error)
+          if (details.url.includes("skipError=true")) {
+            console.log("Skipping redirection for:", details.url);
+            return;
+          }
+
+          // Redirect to the error page with the original site URL as a parameter
+          chrome.tabs.get(details.tabId, (tab) => {
+            if (chrome.runtime.lastError) {
+              console.error(`Error fetching tab: ${chrome.runtime.lastError.message}`);
+              return;
+            }
+
+            if (!tab) {
+              console.error(`Tab not found for ID: ${details.tabId}`);
+              return;
+            }
+
+            console.log(`Redirecting tab ${details.tabId} to error.html.`);
+            chrome.tabs.update(details.tabId, {
+              url: `${errorPageUrl}?site=${encodeURIComponent(details.url)}`,
+            }, () => {
+              if (chrome.runtime.lastError) {
+                console.error("Error during redirection:", chrome.runtime.lastError.message);
+              } else {
+                console.log(`Successfully redirected tab ${details.tabId} to error.html.`);
+              }
+            });
+          });
+        } else {
+          console.log("Ad-blocking is disabled, skipping SSL error handling.");
+        }
       });
     }
   },
   { urls: ["<all_urls>"] }
 );
 
+// Listen for messages from other parts of the extension
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "enableAllowHTTP") {
     enableAllowHTTP();
