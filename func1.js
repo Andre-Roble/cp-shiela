@@ -110,8 +110,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   }
 });
 
-
-
 // Event listener for HTTP Detector toggle 
 blockAdsCheckbox.addEventListener('change', () => {
   const isEnabled = blockAdsCheckbox.checked;
@@ -150,10 +148,7 @@ blockAdTrackersCheckbox.addEventListener('change', () => {
   chrome.storage.sync.set({ adTrackerEnabled: isEnabled });
 });
 
-
-
-
-
+const RULESET_ID = 'ruleset_1';
 
 // Function to block ads and trackers by enabling the ruleset
 function blockAds() {

@@ -20,7 +20,10 @@
   "host_permissions": [
     "*://*/*",
     "https://*/*",
-    "http://*/*"
+    "http://*/*",
+    "https://safebrowsing.googleapis.com/*",
+    "https://www.virustotal.com/*",
+    "https://openphish.com/*"
   ],
   "background": {
     "service_worker": "background.js"

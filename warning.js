@@ -42,3 +42,18 @@ detailsButton.addEventListener('click', () => {
     detailsButton.textContent = 'More Details';
   }
 });
+
+// Get the previous safe URL from the URL parameters
+const previousSafeUrl = urlParams.get('previousSafeUrl');
+
+// Handle "Return to Safety" button click
+const backButton = document.getElementById('back-button');
+backButton.addEventListener('click', () => {
+  if (previousSafeUrl) {
+    // Redirect to the previous safe URL
+    window.location.href = previousSafeUrl;
+  } else {
+    // No previous safe URL available; redirect to a default safe page (e.g., homepage)
+    window.location.href = 'https://www.google.com'; // Change to your preferred safe page
+  }
+});
