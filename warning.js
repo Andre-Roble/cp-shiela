@@ -1,9 +1,9 @@
 // Helper function to determine severity based on reportStats (for VirusTotal scanning only)
 function determineSeverity(reportStats = null) {
   if (reportStats) {
-    if (reportStats.malicious > 10) {
+    if (reportStats.malicious > 20) {
       return 'Critical';
-    } else if (reportStats.malicious > 0 || reportStats.suspicious > 10) {
+    } else if (reportStats.malicious > 0 || reportStats.suspicious > 20) {
       return 'High';
     } else if (reportStats.suspicious > 0) {
       return 'Moderate';

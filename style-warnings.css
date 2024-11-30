@@ -12,14 +12,31 @@
   background-color: #dc3545; 
   color: #fff;
   overflow-x: hidden;
-  overflow-y: hidden;
+  overflow-y: auto; /* Enable vertical scrolling */
+  max-height: 100vh; /* Restrict height to viewport */
 }
+
+/* Optional: Style for the scrollbar */
+#warning-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+#warning-body::-webkit-scrollbar-thumb {
+  background-color: #ff6f61; /* Matches warning theme */
+  border-radius: 4px;
+}
+
+#warning-body::-webkit-scrollbar-track {
+  background-color: #f8d7da;
+}
+
 .w-shiela-icon {
   width: 70px;
   height: 70px;
   vertical-align: middle;
   margin-top: -20px;
 }
+
 .warning-header {
   background-color: #dc3545;
   text-align: center;
