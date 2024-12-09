@@ -212,19 +212,11 @@ checkButton.addEventListener('click', function() {
 
   fetchData(textInput).then(() => {
     checkButton.disabled = false;
-    checkButton.innerHTML = 'Check';
+    checkButton.innerHTML = 'Check Again';
     if (checkButton.contains(loadingIcon)) {
       checkButton.removeChild(loadingIcon);
     }
   });
-});
-
-document.getElementById('textInput').addEventListener('input', function() {
-  checkButton.disabled = false;
-  checkButton.innerHTML = 'Check';
-  if (checkButton.contains(loadingIcon)) {
-    checkButton.removeChild(loadingIcon);
-  }
 });
 
 chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
@@ -237,31 +229,51 @@ chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
 async function fetchData() {
   const textInput = document.getElementById('textInput').value.trim();
   if (!textInput) {
-    alert('Domain field cannot be empty. Please enter a valid domain (e.g. example.com, etc.)');
-    return;
+      alert('Domain field cannot be empty. Please enter a valid domain (e.g. example.com, etc.)');
+      return;
   }
 
   const domain = textInput.replace(/https?:\/\//, ''); // for input
   const parts = domain.split('.');
   if (parts.length < 2) {
-    alert('Invalid input. Please enter a valid domain (e.g. example.com, etc.)');
-    return;
+      alert('Invalid input. Please enter a valid domain (e.g. example.com, etc.)');
+      return;
   }
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 sec to
+
   try {
-    const response = await fetch(`https://check-ssl.p.rapidapi.com/sslcheck?domain=${domain}`, {
-      method: 'GET',
-      headers: {
-        'x-rapidapi-key': '745c95af6bmshe6b922b175f24bdp1921e4jsn7694b614c269',
-        'x-rapidapi-host': 'check-ssl.p.rapidapi.com'
+      const response = await fetch(`https://check-ssl.p.rapidapi.com/sslcheck?domain=${domain}`, {
+          method: 'GET',
+          headers: {
+              'x-rapidapi-key': '745c95af6bmshe6b922b175f24bdp1921e4jsn7694b614c269',
+              'x-rapidapi-host': 'check-ssl.p.rapidapi.com'
+          },
+          signal: controller.signal
+      });
+
+      clearTimeout(timeoutId); // Clr to...if request succeeds
+
+      if (!response.ok) {
+          throw new Error(`API Error: ${response.status} ${response.statusText}`);
       }
-    });
-    const data = await response.json();
-    displayResults(data);
+
+      const data = await response.json();
+      displayResults(data);
   } catch (error) {
-    console.error(error);
-    displayError('Failed to fetch data. Please try again later.');
+      clearTimeout(timeoutId); // Clr to...even if an error occurs
+      if (error.name === 'AbortError') {
+          displayError('The request timed out. Please try again later.');
+      } else {
+          displayError('Failed to fetch data. Please try again later.');
+      }
   }
+}
+
+function displayError(message) {
+  const resultElement = document.getElementById('ssl-result');
+  resultElement.innerHTML = `<div class="error-message" style="color: red; font-weight: bold; text-align:center;">${message}</div>`;
 }
 
 function displayResults(data) {
@@ -349,3 +361,20 @@ function displayResults(data) {
   resultElement.innerHTML = tableTemplate(data, keysToDisplay);
   resultElement.appendChild(showMoreButton);
 }
+
+//info ssl
+document.addEventListener('DOMContentLoaded', function () {
+  const accordion = document.querySelector('.accordion');
+  const accordionContent = document.querySelector('.accordion-content');
+  const accordionIcon = accordion.querySelector('i');
+
+  accordion.addEventListener('click', function () {
+    this.classList.toggle('active');
+    accordionContent.style.display =
+      accordionContent.style.display === 'block' ? 'none' : 'block';
+
+    // Rot arrow icon
+    accordionIcon.classList.toggle('rotated');
+  });
+});
+

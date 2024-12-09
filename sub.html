@@ -41,18 +41,34 @@
         </label>
       </div>
     </div>
-      
+
+    <button class="accordion">
+      Verify SSL Certificate
+      <i id="arrow-ssl"class="fas fa-chevron-right"></i>
+    </button>
+    <div class="accordion-content">
+      <h4>What is an SSL Certificate</h4>
+      <p>SSL stands for Secure Sockets Layer, which ensures that the connection between your browser and the website is secure. It protects sensitive information like passwords, credit card details, and personal data.</p>
+    </div>  
+
       <form id="ssl-check-form" > 
         <div class="ssl-title">
-        <span>SSL Certificate Checker</span></div>
+        <span></span></div>
         <div class="bg-ssl">
 
             <div><input type="text" id="textInput" placeholder="Enter desired URL"></div>
-            <div><button class="check-btn" type="button">Check</button></div>
+            <div><button class="check-btn" type="button">Check this website</button></div>
             
         </div>
-
     </form>
+
+    <!-- <button class="accordion">
+      What is an SSL Certificate?
+      <i class="fas fa-chevron-right"></i>
+    </button>
+    <div class="accordion-content">
+      <p>SSL stands for Secure Sockets Layer, which ensures that the connection between your browser and the website is secure. It protects sensitive information like passwords, credit card details, and personal data.</p>
+    </div>   -->
 
     <div id="ssl-result"></div>
    

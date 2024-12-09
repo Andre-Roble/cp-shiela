@@ -10,10 +10,11 @@
 }
 body {
   margin: 0;
-  height: 260px; 
-  width: 250px; 
   font-family: 'Times New Roman', Times, serif;
-
+  width: 100%;
+  max-width: 300px; 
+  height: auto;
+  overflow-y: auto; 
 
 }
 .title-container {
@@ -53,7 +54,7 @@ body {
   width: auto; 
   border-top: solid #8C52FF;
   border-bottom: solid #8C52FF;
-  margin-bottom: 10px;
+  margin: auto;
 }
 .container-2 {
   display:inline-flexbox;
@@ -70,7 +71,6 @@ body {
   margin-bottom: 10px;
   padding: 10px;
   margin: auto;
-  /* box-shadow: 0 0 10px rgba(255, 0, 123, 0.5); Adjust values as needed */
 
 }
 
@@ -158,7 +158,7 @@ span{
 #textInput{
   width: 218px;
   background-color:transparent; 
-  font-size: 12;
+  font-size: 15px;
   padding: 5px;
   margin-top: 3px;
   margin-bottom: 3px;
@@ -166,7 +166,6 @@ span{
   border: 1px solid #8C52FF;
 
   border-radius: 5px;
-  /* box-shadow: 0 1px 0 rgb(255 255 255 / 50%), 0 1px 0 rgb(0 0 0 / 7%) inset; */
   outline: 0;
   color: #ffffff;
   font-family: 'Times New Roman', Times, serif;
@@ -174,10 +173,10 @@ span{
 }
 
 .ssl-title{
+  border-top: solid #8C52FF;
   padding-left: 10px;
   padding-bottom: 5px;
-  margin-top: -5px;
-  margin-bottom: -5px;
+  margin-bottom: -4px;
 }
 
 .bg-ssl{
@@ -211,9 +210,9 @@ span{
 /* new 9/8 10;23 */
 .ssl-result-table {
   border-collapse: collapse;
-  width: 95%; /*change this if u want*/
+  width: 95%; 
   table-layout: fixed;
-  margin: auto; /* center the table */
+  margin: auto; 
 }
 
 .ssl-result-table th, .ssl-result-table td {
@@ -287,3 +286,42 @@ span{
   color: #7643db;
   text-shadow: 50px #000000 ;
 }
+
+/* info ssl */
+ .accordion {
+  font-size: 12px;
+  font-family: 'Times New Roman', Times, serif;
+  font-weight: bold;
+  background-color: #ffffff;
+  color: #000000;
+  cursor: pointer;
+  padding: 10px;
+  border: none;
+  outline: none;
+  text-align: left;
+  transition: 0.4s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 87%
+
+}
+
+.accordion i {
+  transition: transform 0.3s;
+}
+
+.accordion.active i {
+  transform: rotate(90deg);
+}
+
+.accordion-content {
+  background-color:  #8C52FF;
+  color: white;
+  text-align: justify;
+  padding-left: 7px;
+  padding-right: 10px;
+  display: none;
+  overflow: hidden;
+}
+

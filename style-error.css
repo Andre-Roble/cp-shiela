@@ -9,6 +9,7 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 75vh;
+  padding: 20px; /* added padding to body */
 }
 
 .title-container {
@@ -17,7 +18,7 @@ body {
   width: 90%;
   max-width: 500px;
   background-color: rgba(140, 82, 255, 0.2); 
-  padding: 20px;
+  padding: 40px; /* increased padding to 40px */
   border: 1px solid rgba(255, 255, 255, 0.2); 
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.05);
@@ -27,28 +28,28 @@ body {
 .warning-icon {
   width: 70px;
   height: 70px;
-  margin: 10px auto;
+  margin: 20px auto; /* increased margin to 20px */
   display: block;
 }
 
 h1 {
-  font-size: 50px;
-  margin: 5px 0;
+  font-size: 45px;
+  margin: 10px 0; /* increased margin to 10px */
   margin-bottom: -10px;
 }
 
 p {
-  text-align: center;
-  margin: 10px auto;
-  font-size: 15px;
+  text-align: justify;
+  margin: 20px auto; /* increased margin to 20px */
+  font-size: 15px; /* increased font size to 15px */
   width: 100%;
-  max-width: 400px;
+  max-width: 450px;
 }
 
 button {
-  width: 120px;
-  height: 35px;
-  margin: 20px;
+  width: 150px; /* increased width to 150px */
+  height: 40px; /* increased height to 40px */
+  margin: 20px; /* increased margin to 20px */
   margin-top: 40px;
   border: none;
   border-radius: 5px;
@@ -60,7 +61,6 @@ button {
 button:hover {
   background-color:#8C52FF;
   color: #ffffff;
-
 }
 
 #back-button {
