@@ -363,6 +363,36 @@ function normalizeURL(url) {
   }
 }
 
+// Add DNS error handling and notification
+chrome.webNavigation.onErrorOccurred.addListener((details) => {
+  const url = details.url;
+
+  // Exclude special internal URLs
+  if (url.startsWith("chrome://") || url.startsWith("edge://") || url === "about:blank") {
+    console.log("Ignoring internal browser page or blank tab:", url);
+    return;
+  }
+
+  // Check if phishing detection is enabled
+  chrome.storage.sync.get('phishingDetectionEnabled', (data) => {
+    if (!data.phishingDetectionEnabled) {
+      console.log("Phishing detection is disabled.");
+      return;
+    }
+
+    console.warn(`Failed to load URL: ${url}, Error: ${details.error}`);
+
+    // Create a notification for DNS errors
+    chrome.notifications.create({
+      type: 'basic',
+      iconUrl: 'src/bs-img.png', // Ensure this icon exists in your extension assets
+      title: 'SHIELA',
+      message: "The website failed to load. SHIELA's Phishing Detection might be down. Please refresh the page or close this tab.",
+      priority: 2
+    });
+  });
+}, { url: [{ hostContains: '' }] });
+
 // At the top of background.js
 const lastSafeUrls = {};     // Stores the last safe URL per tab
 const previousSafeUrls = {}; // Stores the previous safe URL per tab
